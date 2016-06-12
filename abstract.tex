@@ -1,0 +1,74 @@
+\documentclass[a4paper, 12pt]{report}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[french]{babel}
+
+
+\title{Rapport de Stage}
+\author{Pierre De Abreu}
+\date{08 Février 2016 - 08 Aout 2016} 
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+ 
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Sogeti, ESEC}
+\lhead{EPITA / SRS 2016}
+\rfoot{\includegraphics[width=4cm]{esec-footer.png}}
+\lfoot{\includegraphics[width=2cm]{epita.png}}
+\lfoot{\includegraphics[width=2cm]{srs.png}}
+\cfoot{\thepage}
+ 
+\begin{document}
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page. The '~' is needed because \\
+% only works if a paragraph has started.
+\includegraphics[width=0.3\textwidth]{epita.png}~\\[1cm]
+
+\textsc{\LARGE EPITA}\\[1.5cm]
+
+\textsc{\Large  Internship}\\[0.5cm]
+\textsc{\Large 08/02/2016 - 08/08/2016}
+
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries Sogeti, ESEC \\[0.4cm] }
+
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+Pierre \textsc{De Abreu (UID: 66101)}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Adrien \textsc{Fay}
+\end{flushright}
+\end{minipage}
+
+\includegraphics[width=0.5\textwidth]{esec.jpg}~\\[1cm]
+
+\vfill
+
+% Bottom of the page
+{\large Some stuff}
+\end{center}
+\end{titlepage}
+\section*{Sogeti}
+\section*{Service}
+\section*{My work}
+\section*{Existing state of affair}
+\section*{Timeline}
+\section*{General appreciation and working conditions}
+\section*{Skills}
+\section*{Conclusion}
+
+\end{document}
