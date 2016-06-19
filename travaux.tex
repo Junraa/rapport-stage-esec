@@ -3,10 +3,87 @@
 \begin{center}
 \end{center}
 \section{Remise en contexte}
+\paragraph{Les vulnérabilités de type Use-After-Free}
+\subparagraph{}
+La plupart des vulnérabilités enseignées et étudiées dans le cadre scolaire
+se rapportent à des fonctionnement souvent statique, ou du moins dont le comportement
+est uniquement lié au programme ciblé en lui-même (à son architecture de compilation et/à
+son code source). On prendra comme exemple les dépassements de tampons, les problèmes de
+formattage des chaines de caractères, etc.\subparagraph{}
+Dans l'environnement industriel, et sur les solutions importantes utilisées dans le monde
+de l'entreprise, ces vulnérabilités sont de plus en plus rare. Premièrement parce que le temps
+faisant son oeuvre, la grande majorité ont été reportées sur les solutions les plus anciennes,
+mais également parce que de nombreux outils pouvant les détecter rapidement (parfois dès la compilation)
+ont été concus.\subparagraph{}
+Les attaquants explorent donc de nouvelles voies, notamment sur des problèmatiques plus dynamiques, et/ou
+lié également à l'environnement de production du programme, comme le système d'exploitation ou la bibliothèque utilisée.
+En effet, de nombreuses opérations du programme dépendent intrisequement du système d'exploitation sous-jacent et
+même si le comportement final reste souvent le même sur les differentes plateformes, les effets colateraux
+sur le contexte et le mécanisme d'execution est souvent différent.\subparagraph{}
+
+\subparagraph{L'évolution des vulnérabilités de type use-after-free}
+\subparagraph{INSERT HISTOGRAM HERE}
+Beaucoup de problème de corruption mémoire sont directement dû à la mauvaise utilisation
+du language utilisé pour le developpement. En effet, les languages de programmation tels que C
+ou C++ demandent une gestion de la mémoire manuelle (le C++ permet néanmoins une gestion plus ou moins automatisée
+avec les nouveaux standards).
+\subparagraph{}
+Il est donc fréquent de rencontrer des erreurs sur ce point là. Cela arrive
+notamment lorsque par un problème de maintenabilité ou de mauvaise conception, la partie du programme devant
+libérer une zone mémoire est méconnue/non documentée.\subparagraph{}
+Ce n'est cependant pas toujours le cas et les allocateurs de mémoires / ramasse-miettes sont parfois en cause.
+
+\subparagraph{Exemple}
+Un exemple très simple et souvent rencontré dans la littérature est le suivant:
+\begin {lstlisting}[frame=single]
+int main(void)
+{
+    int *a = malloc(sizeof(int));
+    *a = 5;
+    free(a);
+    int *b = malloc(sizeof(int));
+    printf("\%d", *b); // affiche 5
+    *b = 7;
+    printf("\%d", *b); // affiche 7
+    *a = 10;
+    printf("\%d", *b); // affiche 10
+}
+\end{lstlisting}
+\subparagraph{}
+Sur une distribution Linux classique comme Ubuntu, quelque soit la taille de mots
+de l'architecture (32 ou 64 bits), les adresses a et b sont exactement les mêmes.
+Cela est directement dû à l'algorithme d'allocation mémoire de la bibliothèque standard
+C.\subparagraph{}
+En effet lors du premier appel à la fonction \textbf{malloc()}, une première zone est allouée.
+Lors de sa libération, la zone libérée est mise en cache, et lors du second appel à \textbf{malloc()},
+l'algorithme va retourner la même zone mémoire. Ce comportement ne sera pas détaillée dans cette section, car
+il demanderait à lui seul plusieurs pages.\subparagraph{}
+Cela va de soi que cet exemple est simpliste, et que les vulnérabilités rencontrées en production sont
+rarement aussi visible. Il permet toutefois de bien visualiser l'origine du problème.
+
+
+\paragraph{Outils existants en dynamique et en statique}
+Des outils simplistes ne suffisent pas à détecter la présence d'use-after-free.\newline
+Par exemple, si une solution détecte uniquement l'accès à une zone mémoire non allouée, l'exemple
+donnée précedemment ne sera pas considéré comme vulnérable, car la zone mémoire est là même pour deux
+allocations différentes. Plusieurs possibilités s'ouvrent alors : l'analyse statique, l'analyse dynamique,
+et un mélange des deux.
+\subparagraph{}
+De nombreuses personnes / équipes se sont penchées sur la détection de ces comportements, dynamiquement et
+statiquement. Nous parlerons tout d'abord des solutions dynamiques existantes, puis nous aborderons \textbf{les approches
+statiques, qui sont directement liées au sujet de ce stage.}
+
+\subparagraph{Kasan: Kernel Adress Sanitizer} est un projet open-source, développée majoritairement
+par les acteurs du noyaux Linux ainsi que par Google. Son but est d'ajouter une couche de protection
+mémoire au noyau Linux afin de détecter certains corruptions mémoires dans les opérations du noyau, comme
+des use-after-free ou des accès hors limites.
+https://github.com/google/kasan
+
 
 \section{Présentation globale du projet}
 
 \section{Résultat à obtenir}
+
 
 \chapter{Compte-rendu d'activité}
 \paragraph{}

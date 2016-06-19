@@ -1,34 +1,91 @@
 \section*{L'entreprise et son secteur d'activité}
-\subparagraph{}
+\paragraph{Sogeti et l'ESEC}
+\subparagraph{Sogeti}
 \begin{center}
-\end{center} 
-\paragraph{}
-\paragraph{}
-
-\begin{center}
+\includegraphics[scale=0.7]{sogeti.png}
 \end{center}
+Sogeti est une Entreprise de Service du Numérique (ESN), filliale appartenant
+à 100\% à Capgemini. Fondée en 1967 à Grenoble par Serge Kampf, elle opère
 \paragraph{}
-\subparagraph{}
-\section*{Le service}
-\subparagraph{}
-\subparagraph{}
-\subparagraph{}
+\paragraph{}
+
+\subparagraph{European Security Expertise Center}
+\begin{center}
+\includegraphics[scale=0.4]{esec.png}
+\end{center}
+L'European Security Expertise Center (ESEC), est le pôle responsable des domaines
+lié à la sécurité de Sogeti. Le centre est composé plusieurs équipes, dont un
+laboratoire de recherche et developpement, ou une équipe dédiée aux tests de penetration.
+C'est dans cette dernière équipe que le stage s'est déroulé.
+
+L'ESEC est directement placé sous le pôle sécurité de Capgemini, dirigé par Frank
+Greverie, secondé par Jean Marc Bianchini pour Sogeti.
+
+Au niveau France, Sogeti et l'ESEC ont plusieurs concurrents, dont Solucom, Deloitte,
+etc. Le domaine de la sécurité informatique étant en explosion, de nombreuses ESN existante
+essayent de développer leurs équipes dans le domaine, afin de gagner des parts de marché
+sur des sujets de plus en plus demandeur en terme de force salariale.
+
 
 \paragraph{}
 \subparagraph{}
+\section*{Le service: Test de pénétration / Pentest}
+
+\subparagraph{}
+
+\section*{Etat des connaissances avant le stage sur le sujet}
+\paragraph{}
+Le cursus de la majeure SRS au sein de l'EPITA a pour but d'apporter une base technique et fonctionnelle
+sur la sécurité. En correlation avec le niveau général de la promotion, les points abordés peuvent être
+plus ou moins avancées. Le sujet de stage portait sur de l'analyse statique de programme binaire, sans rapports
+d'outils externes, pour la detection de vulnérabilité de type usage-après-libération (use-after-free).
+\subparagraph{}
+Les prè-requis sont donc:
+\begin{itemize}
+\item L'analyse statique instrumentalisée.
+\item La compréhension du fonctionnement des allocateurs de mémoires.
+\item Le principe de tainte de mémoire/registre pour l'analyse statique.
+\item Des notions en théorie des graphes.
+\item Des notions en rétro-ingéniérie.
+\end{itemize}
+
+De ces points, la rétro-ingéniérie et la théorie des graphes sont suffisament enseignés à l'EPITA,
+durant l'année de spécialisation ou bien pendant la première année du cycle ingénieur.
+\subparagraph{}
+Concernant les autres points, l'analyse statique instrumentalisée, en comparaison avec ce qui a été
+fait durant le stage, n'était après retour pas très avancée, et les bases étaient difficilement acquises par
+l'ensemble de la promotion SRS. Même si le thème de l'analyse statique était bien abordé, le domaine de l'instrumentalisation
+aurait peut être eu besoin de plus de temps pour être enseigné et compris. Le principe de tainte mémoire/registre étant intimement
+lié à ce dernier point, les commentaires précédents s'y appliquent également.
+\subparagraph{}
+Le point majoritairement manquant concernant ce stage et la plus grosse lacune concernant le sujet du stage résidait dans la compréhension de
+la gestion de la mémoire par un système d'exploitation, des différents niveaux d'allocation mémoire, et de leur fonctionnement précis
+selon les cas (niveau noyau ou niveau utilisateur, différents appels, granularité, algorithme de défragmentation/optimisation, ...).
+\subparagraph{}
+Cette notion est vraiment très peu enseignée durant le cursus de l'EPITA, quelque soit la spécialisation, même si une partie du projet KSTOS
+demandait (à un niveau relativement peu avancé) la compréhension de la relation mémoire physique / mémoire virtuelle.
+Les notions et l'études des ABI (Interface Application-Binaire / Application Binary Interface) est elle aussi assez peu évoquée.
+\subparagraph{}
+
+Néanmoins, le premier mois de stage a été dédié aux points defaillants et le reste du stage a pu se dérouler avec assez de connaissance
+pour être confortable dans ces domaines là.
+
 \subparagraph{}
 
 
 \section*{Positionnement du stage dans l'entreprise}
+\paragraph{}
 \subparagraph{}
+L'équipe pentest cherche à atteindre plusieurs objectifs à travers leurs offres de stage.
+\subparagraph{}
+Le stagiaire doit tout d'abord monter en compétence sur un domaine prècis afin d'atteindre un niveau au plus proche de l'expertise sur son sujet de stage.\newline
+Tout au long du stage se déroulent des présentations d'avancement et/ou de sujet précis dans le cadre du stage, de la part des stagiaires ayant avancé dans leur domaine et/où trouver un thème à discutter au sein de l'équipe. Ceci fait parti d'une des attentes de l'équipe envers ses stagiaires: la diffusion de la connaissance acquise.
+\subparagraph{}
+En complement de ces deux objectifs vient naturellement l'envie de développer des solutions internes pouvant être réutilisées/améliorées à la fin du stage. Selon la difficulté du sujet de stage et/ou des compétences du stagiaire, la solution finale sera plus ou moins utile pour soit l'équipe, soit un nouveau stagiaire.\newline
+
+Concernant le sujet du stage présenté dans ce rapport, le type de vulnérabilité, bien que connu de la majorité de l'équipe, restait assez compliqué à comprendre en détail, notamment de part les connaissances en système et conception d'allocateurs mémoire requises. Avoir un stagiaire dans ce domaine permettait donc d'avoir des rappels / formations sur ces points la lors des diffèrentes présentation.
 
 
 \paragraph{}
-\paragraph{}
-\subparagraph{}
-\subparagraph{}
-\subparagraph{}
-\subparagraph{}
-\subparagraph{}
 \subparagraph{}
 \newpage
