@@ -134,7 +134,32 @@ REIL fournie par l'outil BinNavi. En se basant sur cette représentation, l'outi
 de type use-after-free possibles.
 
 \section{Présentation globale du projet}
+\paragraph{Un analyseur statique}
 
+Le projet de ce stage fut de développer en Python2.7 un analyseur statique de fichier
+binaire exécutable afin de détecter des vulnérabilités de type use-after-free sans aide
+provenant de rapports fournis par des outils externes.
+
+\paragraph{Ambition}
+
+Comme évoquée dans la section précédente de ce rapport, une analyse statique complète est souvent
+longue et très demandante en ressources. Les connaissances en début de stage sur le sujet étant limitées,
+une phase d'apprentissage étant indispensable (retirant donc du temps de développement), l'ambition du stage
+a donc été revue en conséquence.
+\subparagraph
+Plusieurs objectifs étaient fixés concernant la globalité du projet:
+\begin{itemize}
+        \item Une montée en compétence sur le sujet
+        \item Un outil fonctionnel même si long à l'analyse
+        \item Une base maintenable, documentée et reprenable dans des travaux futurs
+\end{itemize}
+
+Il était attendu qu'à la fin du stage, ces points la soient acquis. Le côte "fonctionnel"
+de l'outil était cependant laissé volontairement vague. Les fonctionnalités mises en place
+devaient exister, en étant aussi performante que possible, mais le développement devait se faire
+pas à pas, et la qualité d'une fonctionnalité primait sur l'accumulation de plusieurs autres.
+
+\section{Résultat à obtenir}
 \paragraph{Objectifs d'utilisation de l'outil}
 
 \subparagraph{Différence par rapport à l'existant}
@@ -164,7 +189,6 @@ la valeur de retour d'une fonction, ou les registres contrôlant la pile. Le res
 juste traités comme des identifiants lors de l'analyse.
 
 
-\section{Résultat à obtenir}
 
 
 \chapter{Compte-rendu d'activité}
