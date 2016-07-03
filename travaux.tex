@@ -194,9 +194,100 @@ la valeur de retour d'une fonction, ou les registres contrôlant la pile. Le res
 juste traités comme des identifiants lors de l'analyse.
 
 
-
-
 \chapter{Compte-rendu d'activité}
+\section{Compréhension des allocateurs mémoire}
+Lors de son execution, un programme est chargé en mémoire et le système d'exploitation
+met à sa disposition un espace mémoire (que l'on parle de mémoire virtuelle ou physique)
+d'une certaine taille. Cet espace est découpé en plusieurs parties : les segments du programme
+(segment de code, segment de données, segment de pile, segment de tas), son tas et sa pile. Si les segment de code et de
+données et garde généralement la même taille pour le temps de l'execution, les segments de pile et de tas sont par définition
+dynamique et peuvent s'élargir ou rétrécir. Même s'il est possible d'augmenter la taille de la pile de manière dynamique (grâce
+à la fonction \textbf{alloca()} sur des systèmes UNIX par exemple), son utilisation n'est pas encouragé pour stocker des données
+dynamiques. Le tas, quand à lui, est un espace mémoire spécialement réservé pour cet emploi.
+\begin{center}
+\includegraphics[scale=0.4]{memory-layout.png}\newline
+\end{center}
+
+
+\paragraph{Allocation et Libération: base des algorithmes}
+\subparagraph{Allocation sur le tas}
+Une des fonctions les plus connues des programmeurs et ingénieurs sous environnement UNIX est \textbf{malloc()} (respectivement \textbf{HeapAlloc()} sur
+environnement Windows). En effet, en espace utilisateur, cette fonction est la base de l'allocation mémoire dynamique. Comme beaucoup de fonctions
+manipulant le système d'exploitation et l'architecture sous-jacente, \textbf{malloc()} conserve son état tout au long de l'execution et répertorie les
+changements dans des données réservés à son utilisation (première zone libre, pointeurs sur une structure de base, etc...).
+\subparagraph{}
+Il existe de nombreuses alternatives au classique \textbf{malloc()}, provenant de bibliothèque externe et permettant de s'adapter aux besoins, voir d'améliorer les
+performance globales (\textbf{gmalloc()}, \textbf{TCmalloc()}. Néanmoins, la base de l'algorithme reste le même quelque soit la bibliothèque utilisée.
+
+\subparagraph{Découpage en bloc du tas}
+Pour gérer les allocations de différentes tailles, l'allocateur mémoire découpe au fur et à mesure des demandes
+le segment qui lui est réservé. Ce découpage donne formation à des blocs mémoires qui sont marqués comme libre ou alloué, en gardant leur taille respective
+en information.
+\subparagraph{}
+Pour plus de rapidité lors de l'allocation et la libération, des liens sont conservés entre les différents blocs libres (suivant et précédent). Ainsi lors d'une allocation,
+un parcours simple à partir du premier bloc libre permet de trouver un espace convenant à la demande. D'autres informations peuvent être stockées selon l'implémentation.
+Un des exemples le plus courant est le suivant\footnote{http://gee.cs.oswego.edu/dl/html/malloc.html}:
+\begin{center}
+\includegraphics[scale=0.5]{malloc.png}\newline
+\end{center}
+
+On remarque l'optimisation de l'espace pour les blocs libres. Au lieu d'utiliser de l'espace dans le cas général, qui ne servirait pas dans le cas des blocs alloués,
+on préfère placer les pointeurs vers les autres blocs libres à l'intérieur de l'espace libre. Cela amenera d'ailleurs une discussion sur la granularité des allocations dans
+les prochains paragraphes.
+\subparagraph{}
+La taille est également stockée au début et à la fin d'un bloc. Cela permet une coalescion plus simple des blocs libres. En effet quand deux blocs contigus en
+mémoire sont libres, il est possible des les réunir en un seul plus gros blocs.
+
+\subparagraph{Optimisation : cache}
+Cette algorithme a cependant des limites. Si la fréquence d'allocation est rapide, et si les tailles allouées/libérés sont très variées, on retrouve un phénomene de
+fragmentation important, et les blocs libres restant peuvent être trop petit pour une prochaine allocation, même s'ils auraient pu collectivement suffire.
+\subparagraph{}
+Pour assurer une fragmentation moins importante, la plupart ont mis au point un système de cache (look-aside lists puis Low Fragmentation Heap sur Windows, différents sur Linux).
+Le principe est simple : l'allocateur garde une liste des blocs libres d'une certaines tailles. Selon l'algorithme utilisé, les tailles pré-alloués peuvent différées.
+On peut découper ces stratégies de caches en deux: la refonte différé et la pré-allocation.
+
+\subparagraph{Refonte différé}
+Au lieu de faire une refonte des blocs contigus lors de la libération, les blocs sont conservés libres et indépendent, et rajouté à la liste des blocs libres de
+la taille correspondante. Cela dans l'espoir que les prochaines allocations utiliseront une taille proche.
+
+\subparagraph{Pré-Allocation}
+Plutôt que d'attendre une libération, une partie de la mémoire initiale est pré-découpée pour remplir les caches. L'autre partie est conservé pour les allocations
+ne rentrant pas dans les catégories mises en cache.
+
+\subparagraph{}
+Ce principe de cache est notamment très utile dans les environnements où la même taille est alloué un très grand nombre de fois. On peut imaginer par exemple un
+algorithme allouant une structure pour chacun des utilisateurs s'enregistrant sur une application, ou simplement un service allouant la même taille un très grand nombre
+de fois pour y stocker des messages. En terme de statistique, un programme a souvent un spectre de taille d'allocation réduit, ce qui a conduit à la présence systèmatique de
+cache dans les algorithmes d'allocation mémoire.
+
+
+\subparagraph{Granularité des allocations}
+Comme évoqué précedemment, la granularité des blocs alloués peut varier selon les méthodes et les allocateurs utilisés. La "granularité" d'une allocation
+correspond à une taille fixe dont la taille d'une allocation sera un multiple. En effet, même si l'utilisateur demande un bloc de 4 octets par exemple, la plupart
+des allocateurs renverront un pointeur vers une zone allouée plus grande. Cela vient de plusieurs facteurs.
+
+\subparagraph{}
+Le premier concerne les méta-données conservées à l'intérieur ou autour du bloc alloué. Comme vu dans le schéma sur le découpage classique d'un bloc mémoire,
+on retrouve plusieurs informations (comme des pointeurs en cas de blocs libres) à l'intérieur de la zone mémoire selon son état. Sur une architecture 64 bits,
+deux pointeurs represente en tout 16 octets. Ainsi, sans compter les méta-donnés entourant la zone mémoire réservée à l'utilisateur, une demande de blocs de taille
+inférieure à 16 octets sera tout simplement arrondie...
+\subparagraph{}
+Sur Windows ou UNIX, les appels aux allocateurs courant sont souvent reliés intriséquement aux fonctions d'allocation plus "générale" comme  \textbf{VirtualAlloc()} sur
+Windows, ou \textbf{sbrk()} et \textbf{mmap()} sur UNIX. Ces fonctions ont souvent une granularité beaucoup plus grande (64 kilo octets pour \textbf{VirtualAlloc()}, 4 kilo octets
+pour \textbf{mmap()}). Les allocateurs mémoires de gérer intelligemment et de manière transparente cette espace mémoire souvent trop gros pour une simple demande.
+
+\subparagraph{Liaison avec les vulnérabilités de type Use-After-Free}
+Les optimisations présentés ci-dessous, bien qu'implémenté differement selon les systèmes et bibliothèques, ont tous un point commun.
+Implémenté naivement, elles augmentent certes la rapidité d'execution, mais ceci au prix d'une déterminisation quasi-compléte des zones allouées.
+Une des bases des vulnérabilités de types Use-After-Free est de pouvoir allouer la même zone mémoire que celle libéré plus tôt par le programme.
+Le mechanisme de cache rend cette condition rend ceci beaucoup plus facile que si les zones étaient complétement aléatoires.
+
+\subparagraph{}
+Plusieurs implémentations ont été modifié pour palier cet effet déterministe, et de nouveaux méchanisme de libération mémoire ont également vu le jour.
+MemoryProtector, sur Windows, permet par le biais des fonctions \textbf{ProtectedFree()} de ne réellement liberer la mémoire que lorsque plus aucun pointeur
+résidant sur la pile du programme ne pointe à l'intérieur de la zone mémoire ciblée.\footnote{http://community.hpe.com/t5/Security-Research/Efficacy-of-MemoryProtection-against-use-after-free/ba-p/6556134\#.VuEzVEL8tpg}
+
+\section{Analyse de l'existant: outils de compilation}
 \paragraph{}
 
 \section{Prise en main}
