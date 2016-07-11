@@ -283,12 +283,116 @@ Une des bases des vulnérabilités de types Use-After-Free est de pouvoir alloue
 Le mechanisme de cache rend cette condition rend ceci beaucoup plus facile que si les zones étaient complétement aléatoires.
 
 \subparagraph{}
-Plusieurs implémentations ont été modifié pour palier cet effet déterministe, et de nouveaux méchanisme de libération mémoire ont également vu le jour.
+Plusieurs implémentations ont été modifiées pour palier cet effet déterministe, et de nouveaux méchanisme de libération mémoire ont également vu le jour.
 MemoryProtector, sur Windows, permet par le biais des fonctions \textbf{ProtectedFree()} de ne réellement liberer la mémoire que lorsque plus aucun pointeur
 résidant sur la pile du programme ne pointe à l'intérieur de la zone mémoire ciblée.\footnote{http://community.hpe.com/t5/Security-Research/Efficacy-of-MemoryProtection-against-use-after-free/ba-p/6556134\#.VuEzVEL8tpg}
 
-\section{Analyse de l'existant: outils de compilation}
-\paragraph{}
+
+\subparagraph{}
+Le sujet de stage porte toutefois sur une vulnérabilité en elle-même, et ne prends pas en compte le fait que celle-ci soit expoitable selon
+le système d'exploitation, l'allocateur, etc.
+
+\section{Moteur d'execution concolique}
+\paragraph{Pourquoi de l'execution symbolique ?}
+Un des défaults de l'analyse statique est l'absence de valeurs concrètes facilitant l'analyse. Même si c'est également
+le but majeur de ce type d'analyse (la possibilité d'explorer tous les chemins), il est toujours agréable de conserver une valeur
+associée à un identifiant ou à une zone mémoire, que ce soit sur la pile, sur le tas, ou dans d'autres segments. On peut ainsi se baser
+sur ses valeurs pour évaluer la possiblité de prendre tel ou tel chemin, de réaliser des calculs, ou d'avoir tout simplement une réference en
+matière de debug.
+\paragraph{Les bases de l'execution symbolique}
+Ce principe d'associer une valeur non-concrète à un identifiant ou une zone mémoire est connu sous le nom d'execution symbolique. Comme son nom
+l'indique, le principe est d'initialiser la valeur à un symbole lorsqu'elle est créée, et d'executer le programme en se basant sur cette valeur initiale.
+Par exemple, sur x86, le registre \textbf{EAX} pourra être initialiser à la valeur \textbf{EAX\_INIT}. Ainsi une future opération \textbf{add EAX, 4} assignera
+au même registre la valeur symbolique \textbf{EAX\_INIT + 4}.
+
+\subparagraph{}
+Un moteur d'execution symbolique complet contiendra également les opérations classiques en programmation, comme le dereferencement mémoire d'une valeur
+symbolique, les opérations arithmétiques, etc. Concernant les opérations liés à la mémoire, la plupart des moteurs choississent de créer un espace associé à
+un espace mémoire concret uniquement lorsque celui-ci est addressé en écriture. Cela permet de garder une double dimension début/taille sans pourtant autant
+nécessiter une représentation exessivement volumineuse en terme de mémoire par l'outil.
+\subparagraph{}
+Cela peut néanmoins poser problème si le programme essaye d'accéder à une
+zone non initialisé (ce qui peut être une vulnérabilité en soit pour un programme. Soit l'outil utilisé peut soit rencontrer un problème et terminer en erreur,
+ou retourner une valeur nulle. Dans certains cas d'analyse, on peut néanmoins tout simplement initialisé la mémoire si celle-ci ne l'était pas déjà à une valeur concrete
+par defaut ou bien à un symbole non utilisé ailleurs.
+
+\paragraph{Concolique: un mélange de concret et de symbolique}
+Parfois, lors de l'analyse d'un programme, lorsqu'un chemin est pris par exemple, une seule valeur est possible pour tel ou tel identifiant/registre/espace mémoire.
+\begin {lstlisting}[frame=single]
+int main(void)
+{
+    int a = f();
+    if (a == 0)
+        g();
+    else
+        h();
+}
+\end{lstlisting}
+Dans l'exemple ci-dessus, deux chemins sont possibles: l'un menant à un appel à \textbf{g()}, l'autre à \textbf{h()}.
+L'analyse peut alors se séparer en deux chemins. Néanmoins, pour le chemin menant à \textbf{g()}, la valeur de l'identifiant \texbf{a}
+n'a qu'une seule possibilité, la valeur 0. Certains solveurs de contraintes, dont nous parlerons dans la prochaine section, permettent d'arriver
+à des conclusions comme celle ci en gardant toutes les contraintes valables pour un chemin.
+\subparagraph[}
+Dans des cas comme celui-ci, la valeur est directement injectée dans le moteur d'execution symbolique. Ce mélange de valeur concrete et symbolique est
+appelé \textbf{execution concolique}. Cela permet de réduire le temps de calcul des assertions (la valeur correspondante étant déjà prise en compte) et de
+réduire en mémoire la taille des expressions symboliques.
+
+
+\section{Solveurs SMT}
+\paragraph{Contraintes associés aux chemins}
+Dans un programme, une division de l'analyse en deux est toujours dû à la même structure : une condition lié à une boucle ou à une structure de type if-then-else.
+Cette condition sur une valeur donnée réduit (à moins que la condition ne soit sémantiquement pas correcte initialement) le champs de valeur possible pour un identifiant.
+Parfois même, la condition ou l'enchainement des conditions sur un même chemin d'execution est assez restrictive pour ne donner qu'une seule valeur possible.
+Même si cela peut paraitre evident pour une analyse manuelle, il peut être délicat de résoudre ces contraintes sans aide extérieur. C'est donc le but de ce qu'on appelle : les \textbf{solveurs SMT}.
+\subparagraph{}
+Un \textbf{solveur SMT} (Satisfiabilité Modulo Théories) permet de résoudre un ensemble de contrainte exprimé dans la logique premier ordre. Ce type de solveur peut décider
+de la solvabilité ou non de cet ensemble de contrainte. Cela permet, par exemple lors de l'analyse statique, de ne pas prendre un chemin dont les valeurs associés n'auraient
+de sens d'un point de vue relationnel.
+\subparagraph{}
+Pour un chemin dont les contraintes sont satisfaisables selon le solveur SMT, ce même solveur peut fournir un modèle. Ce modèle represente l'ensemble des valeurs possibles
+pour les variables rentrant en jeu dans les contraintes. Lorsque plusieurs valeurs sont possibles, on peut au choix et selon le but de l'analyse, sauvegarder les contraintes
+en esperant de futures conditions plus restrictives, ou assigner un des ensembles de valeurs à nos identifiants symboliques.
+
+
+
+\section{Choix d'implémentation: outils de décompilation}
+\paragraph{Critères de sélection}
+Pour réaliser le sujet de stage, en dehors du language de programmation en lui-même, un ou plusieurs outils effectuant
+un pré-traitement sur l'entrée était nécessaire. En effet, la solution finale prend en entrée un programme binaire et un point
+d'entrée. Il n'était pas concevable d'effectuer le traitement sur du binaire, ou d'effectuer une analyse différentes selon le format
+et l'architecture visée par le binaire (les instructions étant différentes).
+\subparagraph{}
+Un moteur d'execution symbolique est également de mise. Il représente à lui seul une grosse partie de l'analyse statique permettant de
+garder en mémoire les valeurs des identifiants par rapport à leur valeur d'origine. Un solveur SMT permet également de réduire le nombre
+de chemins possibles et réduit souvent drastiquement le problème d'explosion de chemins.
+\subparagraph{}
+Il a donc fallu chercher un ou plusieurs outils de base, pouvant effectuer la décompilation du binaire puis la transformation en une
+représentation intermédiaire. Heuresement, la plupart des outils libres d'analyses binaires proposent les deux, souvent de manière transparente.
+Ils proposent également leur moteur d'execution concolique associé. Le solveur SMT est la plupart du temps imposé. En effet, ce type de solveur prennent
+en entrée une syntaxe et des objets particuliers, qu'il faut traduire. Ainsi la traduction de la representation intermédiaire est intriséquement lié à cette
+représentation, et re-coder une traduction de chaque objet pour un solveur particulier prendrait trop de temps pour être rentable sur la durée d'un stage.
+\subparagraph{}
+Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ainsi que les comparaisons faites seront résumés à la fin.
+
+\paragraph{Angr}
+Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
+Il permet de charger un binaire et d'avoir une représentation binaire de ce binaire en utilisant sa propre représentation intermédiaire, \textbf{VEX}.
+Il dispose également d'un moteur d'execution symbolique et est très complet dans ses fonctionnalités, permettant de récupérer pleins d'information via
+une API plutôt complète. La résolution des contraintes est réalisée grâce à un module interne nommé \textbf{Claripy}
+\subparagraph{}
+En terme de maturité, le projet a vite atteint une autre dimension, et ses utilisateurs sont de plus en plus nombreux. Il supporte plusieurs formats
+binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques (AMD64, MIPS, ARM, ...).
+
+\paragraph{Miasm}
+Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
+Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
+cependant externe, l'outil traduisant juste la représentation intermédiaire vers un langage compréhensible par le très connu Z3 de Microsoft.
+\subparagraph{}
+Un des désavantage de Miasm est ses fortes dépendances envers un nombre élevés de bibliothéques externes, sur des versions parfois obsolétes. La documentation est également
+quasi-inexistante.
+
+\paragraph{Capstone}
+Capstone est la star montante du monde de la retro-ingéniérie
 
 \section{Prise en main}
 \section{Interprétation et critique des résultats}
