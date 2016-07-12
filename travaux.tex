@@ -3,7 +3,7 @@
 \begin{center}
 \end{center}
 \section{Remise en contexte}
-\paragraph{Les vulnérabilités de type Use-After-Free}
+\myparagraph{Les vulnérabilités de type Use-After-Free}
 \subparagraph{}
 La plupart des vulnérabilités enseignées et étudiées dans le cadre scolaire
 se rapportent à des fonctionnement souvent statique, ou du moins dont le comportement
@@ -62,14 +62,14 @@ Cela va de soi que cet exemple est simpliste, et que les vulnérabilités rencon
 rarement aussi visible. Il permet toutefois de bien visualiser l'origine du problème.
 
 
-\paragraph{Outils existants en dynamique et en statique}
+\myparagraph{Outils existants en dynamique et en statique}
 Des outils simplistes ne suffisent pas à détecter la présence d'use-after-free.\newline
 Par exemple, si une solution détecte uniquement l'accès à une zone mémoire non allouée, l'exemple
 donnée précédemment ne sera pas considéré comme vulnérable, car la zone mémoire est là même pour deux
 allocations différentes. Plusieurs possibilités s'ouvrent alors : l'analyse statique, l'analyse dynamique,
 et un mélange des deux.
 
-\paragraph{Analyse dynamique}
+\myparagraph{Analyse dynamique}
 De nombreuses personnes / équipes se sont penchées sur la détection de ces comportements, dynamiquement et
 statiquement. Nous parlerons tout d'abord des solutions dynamiques existantes, puis nous aborderons \textbf{les approches
 statiques, qui sont directement liées au sujet de ce stage.}
@@ -92,7 +92,7 @@ Undangle est également un exemple connu, spécialement dédié à la découvert
 de type use-after-free et double-free, à partir d'une trace d'exécution. Il a été développé par plusieurs
 personnes travaillant à l'IMDEA Software Institute.
 
-\paragraph{Analyse statique}
+\myparagraph{Analyse statique}
 
 De nombreux outils dynamique détectant les problèmes liés à la mémoire existent et remplissent parfaitement leur rôle.
 L'analyse dynamique a néanmoins plusieurs défauts.\newline
@@ -139,13 +139,13 @@ REIL fournie par l'outil BinNavi. En se basant sur cette représentation, l'outi
 de type use-after-free possibles.
 
 \section{Présentation globale du projet}
-\paragraph{Un analyseur statique}
+\myparagraph{Un analyseur statique}
 
 Le projet de ce stage fut de développer en Python2.7 un analyseur statique de fichier
 binaire exécutable afin de détecter des vulnérabilités de type use-after-free sans aide
 provenant de rapports fournis par des outils externes.
 
-\paragraph{Ambition}
+\myparagraph{Ambition}
 
 Comme évoquée dans la section précédente de ce rapport, une analyse statique complète est souvent
 longue et très demandante en ressources. Les connaissances en début de stage sur le sujet étant limitées,
@@ -165,7 +165,7 @@ devaient exister, en étant aussi performante que possible, mais le développeme
 pas à pas, et la qualité d'une fonctionnalité primait sur l'accumulation de plusieurs autres.
 
 \section{Résultat à obtenir}
-\paragraph{Objectifs d'utilisation de l'outil}
+\myparagraph{Objectifs d'utilisation de l'outil}
 
 \subparagraph{Différence par rapport à l'existant}
 
@@ -209,7 +209,7 @@ dynamiques. Le tas, quand à lui, est un espace mémoire spécialement réservé
 \end{center}
 
 
-\paragraph{Allocation et Libération: base des algorithmes}
+\myparagraph{Allocation et Libération: base des algorithmes}
 \subparagraph{Allocation sur le tas}
 Une des fonctions les plus connues des programmeurs et ingénieurs sous environnement UNIX est \textbf{malloc()} (respectivement \textbf{HeapAlloc()} sur
 environnement Windows). En effet, en espace utilisateur, cette fonction est la base de l'allocation mémoire dynamique. Comme beaucoup de fonctions
@@ -293,13 +293,13 @@ Le sujet de stage porte toutefois sur une vulnérabilité en elle-même, et ne p
 le système d'exploitation, l'allocateur, etc.
 
 \section{Moteur d'execution concolique}
-\paragraph{Pourquoi de l'execution symbolique ?}
+\myparagraph{Pourquoi de l'execution symbolique ?}
 Un des défaults de l'analyse statique est l'absence de valeurs concrètes facilitant l'analyse. Même si c'est également
 le but majeur de ce type d'analyse (la possibilité d'explorer tous les chemins), il est toujours agréable de conserver une valeur
 associée à un identifiant ou à une zone mémoire, que ce soit sur la pile, sur le tas, ou dans d'autres segments. On peut ainsi se baser
 sur ses valeurs pour évaluer la possiblité de prendre tel ou tel chemin, de réaliser des calculs, ou d'avoir tout simplement une réference en
 matière de debug.
-\paragraph{Les bases de l'execution symbolique}
+\myparagraph{Les bases de l'execution symbolique}
 Ce principe d'associer une valeur non-concrète à un identifiant ou une zone mémoire est connu sous le nom d'execution symbolique. Comme son nom
 l'indique, le principe est d'initialiser la valeur à un symbole lorsqu'elle est créée, et d'executer le programme en se basant sur cette valeur initiale.
 Par exemple, sur x86, le registre \textbf{EAX} pourra être initialiser à la valeur \textbf{EAX\_INIT}. Ainsi une future opération \textbf{add EAX, 4} assignera
@@ -316,7 +316,7 @@ zone non initialisé (ce qui peut être une vulnérabilité en soit pour un prog
 ou retourner une valeur nulle. Dans certains cas d'analyse, on peut néanmoins tout simplement initialisé la mémoire si celle-ci ne l'était pas déjà à une valeur concrete
 par defaut ou bien à un symbole non utilisé ailleurs.
 
-\paragraph{Concolique: un mélange de concret et de symbolique}
+\myparagraph{Concolique: un mélange de concret et de symbolique}
 Parfois, lors de l'analyse d'un programme, lorsqu'un chemin est pris par exemple, une seule valeur est possible pour tel ou tel identifiant/registre/espace mémoire.
 \begin {lstlisting}[frame=single]
 int main(void)
@@ -329,17 +329,17 @@ int main(void)
 }
 \end{lstlisting}
 Dans l'exemple ci-dessus, deux chemins sont possibles: l'un menant à un appel à \textbf{g()}, l'autre à \textbf{h()}.
-L'analyse peut alors se séparer en deux chemins. Néanmoins, pour le chemin menant à \textbf{g()}, la valeur de l'identifiant \texbf{a}
+L'analyse peut alors se séparer en deux chemins. Néanmoins, pour le chemin menant à \textbf{g()}, la valeur de l'identifiant \textbf{a}
 n'a qu'une seule possibilité, la valeur 0. Certains solveurs de contraintes, dont nous parlerons dans la prochaine section, permettent d'arriver
 à des conclusions comme celle ci en gardant toutes les contraintes valables pour un chemin.
-\subparagraph[}
+\subparagraph{}
 Dans des cas comme celui-ci, la valeur est directement injectée dans le moteur d'execution symbolique. Ce mélange de valeur concrete et symbolique est
 appelé \textbf{execution concolique}. Cela permet de réduire le temps de calcul des assertions (la valeur correspondante étant déjà prise en compte) et de
 réduire en mémoire la taille des expressions symboliques.
 
 
 \section{Solveurs SMT}
-\paragraph{Contraintes associés aux chemins}
+\myparagraph{Contraintes associés aux chemins}
 Dans un programme, une division de l'analyse en deux est toujours dû à la même structure : une condition lié à une boucle ou à une structure de type if-then-else.
 Cette condition sur une valeur donnée réduit (à moins que la condition ne soit sémantiquement pas correcte initialement) le champs de valeur possible pour un identifiant.
 Parfois même, la condition ou l'enchainement des conditions sur un même chemin d'execution est assez restrictive pour ne donner qu'une seule valeur possible.
@@ -356,7 +356,7 @@ en esperant de futures conditions plus restrictives, ou assigner un des ensemble
 
 
 \section{Choix d'implémentation: outils de décompilation}
-\paragraph{Critères de sélection}
+\myparagraph{Critères de sélection}
 Pour réaliser le sujet de stage, en dehors du language de programmation en lui-même, un ou plusieurs outils effectuant
 un pré-traitement sur l'entrée était nécessaire. En effet, la solution finale prend en entrée un programme binaire et un point
 d'entrée. Il n'était pas concevable d'effectuer le traitement sur du binaire, ou d'effectuer une analyse différentes selon le format
@@ -374,7 +374,7 @@ représentation, et re-coder une traduction de chaque objet pour un solveur part
 \subparagraph{}
 Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ainsi que les comparaisons faites seront résumés à la fin.
 
-\paragraph{Angr}
+\myparagraph{Angr}
 Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
 Il permet de charger un binaire et d'avoir une représentation binaire de ce binaire en utilisant sa propre représentation intermédiaire, \textbf{VEX}.
 Il dispose également d'un moteur d'execution symbolique et est très complet dans ses fonctionnalités, permettant de récupérer pleins d'information via
@@ -383,7 +383,7 @@ une API plutôt complète. La résolution des contraintes est réalisée grâce 
 En terme de maturité, le projet a vite atteint une autre dimension, et ses utilisateurs sont de plus en plus nombreux. Il supporte plusieurs formats
 binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques (AMD64, MIPS, ARM, ...).
 
-\paragraph{Miasm}
+\myparagraph{Miasm}
 Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
 Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
 cependant externe, l'outil traduisant juste la représentation intermédiaire vers un langage compréhensible par le très connu Z3 de Microsoft.
@@ -391,9 +391,51 @@ cependant externe, l'outil traduisant juste la représentation intermédiaire ve
 Un des désavantage de Miasm est ses fortes dépendances envers un nombre élevés de bibliothéques externes, sur des versions parfois obsolétes. La documentation est également
 quasi-inexistante.
 
-\paragraph{Capstone}
-Capstone est la star montante du monde de la retro-ingéniérie
+\myparagraph{Capstone}
+Capston\footnote{http://www.capstone-engine.org/} est la star montante du monde de la retro-ingéniérie. En plus d'une communauté gigantesque et d'une
+documentation bien construite, de nombreux projets se basent déjà sur son architecture. De plus, le projet est plutôt jeune, ce qui permets d'avoir des
+dépendances recentes. La plupart des distributions ont de toute manière des paquets déjà prêt pour une installation simplifié.
+\subparagraph{}
+Néanmoins, aucune représentation intermédiaire n'est directement proposé par l'infrastructure de Capstone (même si plusieurs projet comme OpenReil se sont basés
+dessus pour fournir une representation intermédiaire).
 
-\section{Prise en main}
+
+\myparagraph{Comparaison}
+
+\begin{table}[H]
+    \centering
+    \caption{Comparatif des suites de rétro-ingéniérie/analyse choisies}
+    \label{itd}
+    \begin{tabular}{c|c|c|c}
+                      & Angr     & Miasm   & Capstone \\
+        \hline
+        Graphe        & Oui      & Oui     & Non      \\
+        \hline
+        RI            & Oui      & Oui     & Non      \\
+        \hline
+        Documentation & Oui      & Non     & Oui+     \\
+        \hline
+        Connu         & Oui      & Oui     & Oui+     \\
+        \hline
+        Plateforme    & x86,MIPS & x86,ARM & A lot
+    \end{tabular}
+\end{table}
+
+A l'époque à laquelle s'est déroulé cette reflexion, Angr n'avait pas vraiment été
+considéré (ce qui sera d'ailleurs considéré comme une erreur plus tard lors du bilan du stage).
+Miasm permettant de faire tout ce qui avait été établi lors du cahier des charges, c'est donc la suite d'outils qui fut choisie.
+Même si la documentation lui fait cruellement défaut, la plupart des exemples suffisent à prendre en main (de manière basique) l'ensemble.
+\subparagraph{}
+Une étude plus en profondeur de l'outil a ensuite aidé à mieux affiner son usage et à utiliser des fonctions internes pour réaliser des travaux
+plus finement.
+
+\section{L'analyse statique d'Use-After-Free}
+\paragraph{Graphe d'instructions}
+Le graphe d'instructions d'un programme est représenté sous la forme d'un graphe orienté dont les noeuds rassemblent une ou plusieurs
+instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graphe relient les instructions dans leur ordre d'execution.
+Un noeud peut avoir un ou plusieurs noeuds entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
+\includegraphics[scale=1.5]{condition.png}\newline
+\subparagraph{}
+
 \section{Interprétation et critique des résultats}
 \subparagraph{}
