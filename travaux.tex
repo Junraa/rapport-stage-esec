@@ -402,7 +402,7 @@ dessus pour fournir une representation intermédiaire).
 
 \myparagraph{Comparaison}
 
-\begin{table}[H]
+\begin{table}[h]
     \centering
     \caption{Comparatif des suites de rétro-ingéniérie/analyse choisies}
     \label{itd}
@@ -430,12 +430,221 @@ Une étude plus en profondeur de l'outil a ensuite aidé à mieux affiner son us
 plus finement.
 
 \section{L'analyse statique d'Use-After-Free}
-\paragraph{Graphe d'instructions}
+\myparagraph{Graphe d'instructions}
 Le graphe d'instructions d'un programme est représenté sous la forme d'un graphe orienté dont les noeuds rassemblent une ou plusieurs
 instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graphe relient les instructions dans leur ordre d'execution.
 Un noeud peut avoir un ou plusieurs noeuds entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
-\includegraphics[scale=1.5]{condition.png}\newline
+\begin{center}
+\includegraphics[scale=0.3]{condition.png}\newline
+\end{center}
 \subparagraph{}
+Cette illustration est la representation graphique d'un exemple de graphe qui sera parcouru durant l'analyse. Le graphe est parcouru \textbf{dans l'ordre},
+en partant d'un point d'entrée donné en entrée. Ce \textbf{point d'entrée} peut soit être \textbf{une adresse en hexadecimal} (0xABCDF) ou \textbf{un nom de fonction
+suivi optionnellement d'un offset hexadecimal} (main\[+0x12\]). Cette entrée doit correspondre à un \textbf{label} présent sur un des noeuds du graphes.
+\subparagraph{}
+Durant la décompilation, Miasm découpe le programme en \textbf{\textit{basic blocks}}. Un \textit{basic blocks} est défini comme ceci :
+une suite d'instruction successive se terminant par un branchement ou un point de sortie. Cela permet de découper en fonction logique
+le programme et de le représenter sous forme de diagramme de décision. La lecture est alors plus simple, plus naturelle, et les chemins se suivent et se
+séparent logiquement, ressemblant plus à la manière dont le code source se divise que celle du code binaire/assembleur.
+\subparagraph{}
+Miasm génére également d'autres \textbf{basic blocks} lors des appels de fonctions. Ils permettent de traiter différement ces blocs, d'effectuer une pré-analyse
+de la fonction, etc.
+
+\myparagraph{Representation intermédiaire de Miasm}
+Toutes les intructions de la représentation intermédiaire de Miasm sont représentés sous la forme d'une assignation : EXPR1 = EXPR2.
+L'expression de gauche étant un registre ou un espace mémoire valide, et l'expression de droite pouvant être n'importe quelle expression
+representant in fine une valeur.
+\subparagraph{}
+En interne, les expressions sont découpés en 5 types, tous défini par une taille (généralement 32 ou 64 bits) et des arguments optionnels:
+\begin{itemize}
+    \item Les ExprInt : un entier, d'une taille définie.
+    \item Les ExprID : un identifiant, le plus souvent un registre.
+    \item Les ExprMem : un espace mémoire, dont l'adresse est donné par l'argument de l'expression. Cette expression peut être de n'importe quel type.
+    \item Les ExprOp : une opération entre deux expressions (les opérations mathématiques classiques ainsi que les appels de fonctions).
+    \item Les ExprCond : une condition. La condition est représenté par une expression selon le même principe qu'en C. Si la valeur de l'expression est 0, la condition est fausse, sinon elle est considérée comme vraie. Une ExprCond prend également en paramètre deux expressions representant le branchement à prendre (souvent des ExprInt.
+    \item les ExprSlice et ExprComp : composition et décomposition de une ou plusieurs emplacements selon un nombre de bits précis.
+\end{itemize}
+En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
+\begin{itemize}
+    \item Pour le \textit{basic block} \textbf{main+0x23}, la premiere instruction (\textbf{ExprMem}) assigne à l'emplacement désigné par \textbf{l'adresse}
+        présente dans \textbf{ESP} la valeur \textbf{0x4}.
+    \item Les blocs se finissent tous par une assignation de l'identifiant \textbf{IRDst}, indiquant le prochain basic blocs dans l'execution.
+        En l'occurence, toutes les assignations de cet exemple sont des \textbf{ExprInt}. S'il s'agissait d'un branchement, l'expression assigné à \textbf{IRDst}
+        aurait été de type \textbf{ExprCond}.
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.3]{ir.png}\newline
+\end{center}
+\subparagraph{}
+Chacune des instructions intermédiaires représente une ou plusieurs instructions du binaire ciblé. En effet, un language intermédiaire
+pouvant se retrouver à travailler sur plusieurs architectures cibles, une instruction complexe sur une d'elle est retransformée en de multiples
+fragments, pouvant alors se retransformer/reassembler sur une autre architecture si besoin.
+\subparagraph{}
+Chacun des \textit{basic blocks} est divisé en "déclaration". Ces déclarations réunissent des instructions qui effectue une même action. Une instruction cible décomposée
+verra sa transformation, possiblement constitué de plusieurs instructions intermédiaires, regroupée en une seule "déclaration".
+
+
+
+\myparagraph{Reconnaitre un use-after-free}
+Comme dit précedemment, un use-after-free est l'enchainement d'une allocation, d'une libération, puis de l'utilisation d'un espace mémoire.
+\subparagraph{Allocation}
+Une \textbf{allocation} dans le sens de la présente analyse, est l'appel d'une fonction etant marquée comme \textit{allocatrice}. En reprenant les deux noeuds intermédiaires
+du paragraphe précédent, on peut comprendre comment Miasm traduit un appel de fonction. Dans le cas présenté, il s'agissait d'une allocation en utilisant la fonction malloc,
+avec comme argument la taille d'une zone de stockage de type C \textbf{int}.
+Le registre d'instruction (ici \textbf{EIP} est mis à jour, les arguments sont placés dans les registres qui conviennnent ou bien sur la pile.
+Ici \textbf{0x4} est poussé sur la pile. Le binaire décompilé étant conçu pour l'architecture x86, \textbf{ESP} est également décrémenté de \textbf{4 octets},
+et l'adresse de la prochaine instruction est stocké sur la pile également.
+\subparagraph{}
+Miasm génére alors un \textit{basic block} virtuel (\textit{lbl\_gen\_X}) qui stocke la valeur de retour de la fonction (\textbf{ExrOp(call\_func\_ret)})
+là où la convention d'appel du binaire le veut. Le principe suivant est appliqué:
+\begin{enumerate}
+    \item La fonction est-elle annoté \textbf{@extern} ? Si non, l'analyse continue en suivant cet appel.
+    \item La fonction est-elle traquée comme allocatrice ? Si oui, la valeur de retour ainsi que le registre servant à la stocker sont mémorisés.
+\end{enumerate}
+
+\subparagraph{Libération}
+En suivant le même principe que pour l'allocation, si une fonction est marqué comme libératrice, si ses arguments sont mémorisés comme faisant reference
+à une zone mémoire précedemment allouée, cette zone est marqué comme libre.
+
+\subparagraph{Utilisation}
+Lors du parcours du graphe, lorsque qu'une instruction intermédiaire est analysée, si la source comprends une référence à une zone mémoire marqué comme libre,
+un UAF est détécté.
+
+\myparagraph{Algorithme basique}
+L'exemple de pseudo-code ci dessous illustre l'algorithme utilisé pour la base de l'analyse.
+\begin {lstlisting}[frame=single]
+allocation_id = 0
+head_node = flowgraph.get_node(start)
+
+ir_block = ir.get_bloc(head_node)
+for statement in ir_block:
+
+    evaluate_ir(statement)
+
+    for dst, src in statement:
+
+        check_if_src_depends_on_free(free_set, src)
+
+        # Propagate tainted expression
+        del tracking_set[dst]
+        if src in tracking_set:
+            tracking_set[dst] = tracking_set[src]
+
+        if src.is_function_call() and "ret" in str(src):
+            # If alloc_tracking_set, track the newly allocated memory
+            # address
+            if call_name in allocation_functions:
+                tracking_set[dst] = allocation_id
+                allocation_id = allocation_id + 1
+
+            # If free_tracking_set, mark the corresponding zone as free
+            if call_name in free_functions:
+                free_set.add(tracking_set[arguments])
+
+go_to_next_basic_block()
+\end{lstlisting}
+
+L'algorithme utilise deux structures de données très importantes :
+
+\begin{itemize}
+        \item tracking\_set : un dictionnaire associant un identifiant ou une zone mémoire à un identifiant d'allocation.
+        \item free\_set : un ensemble des identifiants d'allocations libéré.
+\end{itemize}
+
+Chaque allocation se voit attribué un identifiant unique (\textbf{allocation\_id}). Cela permet de centraliser les informations
+en utilisant uniquement cet identifiant lorsque nécessaire.
+
+L'algorithme ci-dessus est du pseudo-code sur un traitement simple.
+Premièrement, le noeud courant (\textit{basic block} est récupéré du graphe. Pour chaque instructions du graphe, on évalue symboliquement
+l'expression afin de mettre à jour le moteur d'execution symbolique.
+\subparagraph{}
+L'expression source est vérifiée afin de s'assurer qu'elle ne dépend pas d'un bloc mémoire libéré.
+\subparagraph{}
+Ensuite, on supprime si présent la destination de l'ensemble d'expressions traquées. En effet, celle ci va prendre une nouvelle valeur et est donc
+réinitialisée. Si la source dépend d'un bloc connu, on met à jour le dictionnaire.
+\subparagraph{}
+Selon la fonction appellé, on peut soit ajouter un nouveau bloc, soit en libérer un, soit ne rien faire.
+\paragraph{Tainte}
+Ce principe de tainte est excesssivement utilisé dans l'analyse de binaire ou de programme. Le principe est simple, intuitif et plutôt modulaire selon l'analyse, il n'y aura
+donc pas d'explication détaillé de son fonctionnement dans ce rapport. Néanmoins les notions de base sont les suivantes:
+\begin{itemize}
+        \item Un element de l'analyse est marqué comme tainté lors d'une procédure définie.
+        \item Lorsque cet element est en contact ou lié avec un autre element, et que cette liaison respecte certains
+            critères, cet autre element est également marqué comme tainté.
+        \item Chaque teinte doit avoir une couleur. La couleur est possiblement la même pour chaque element tainté.
+\end{itemize}
+
+\myparagraph{Architecture du scanner et objets}
+Le but de tout projet à long terme est d'être maintenable par des nouveaux arrivants, et de pouvoir s'améliorer
+sans difficulté. Cela passe par la documentation, mais également par une architecture et une conception réfléchie à l'avance
+et si possible modulaire.
+\subparagraph{Architecture}
+Le projet est divisé en trois parties:
+\begin{enumerate}
+        \item Le parcours de graphe
+        \item L'analyse et le marquage (teinte)
+        \item Les optimisations de parcours du graphe.
+\end{enumerate}
+Chaque couche X est plus ou moins dépendante de la couche X-1. Néanmoins, l'inverse ne doit pas être vrai.
+Si l'analyse et le code associé commence à dépendre de la manière dont l'optimisation évolue, alors la conception commence à poser problème.
+En effet, si une optimisation prend le pas sur d'autres, on restreint les possibilités. Une phrase célébre de Donald Knuth résume d'ailleurs cette situation:
+\textit{L'optimisation prématurée est la racine de tous les maux}.
+\subparagraph{}
+Le parcours de graphe est en réalité un squelette, avec plusieurs endroits dans lesquels il est possible de faire des traitements ou optimisations. L'algorithme de base
+épuré pour ne laisser que le parcours de graphe ressemble à ceci:
+\begin {lstlisting}[frame=single]
+allocation_id = 0
+head_node = flowgraph.get_node(start)
+
+ir_block = ir.get_bloc(head_node)
+# Do something 1
+for statement in ir_block:
+    # Do something 2
+    for dst, src in statement:
+        # Do something X
+        if src.is_function_call() and "ret" in str(src):
+            # Do something Y
+            if must_follow_function_call:
+                follow_function_call()
+        # Do something Z
+
+go_to_next_basic_block()
+\end{lstlisting}
+
+\subparagraph{Modules python}
+Le projet est découpé en plusieurs modules python:
+\begin{itemize}
+        \item Le scanner en lui même.
+        \item Le "moteur" de teinte.
+        \item Le module annexe contenant tous les algorithmes utiles (sur les graphes, factorisation de listes, etc.).
+\end{itemize}
+
+\subparagraph{L'objet Scanner}
+Un scanner est représenté par un objet Python. Il contient plusieurs propriétés et méthodes permetant de le manipuler directement.
+Les attributs principaux sont:
+\begin{itemize}
+    \item \textbf{disassemble\_callback} : Fonction à appeller pour aller récupérer un bloc dans un graphe.
+    \item \textbf{alloc\_tracking\_set} : Ensemble de fonctions allocatrices de mémoire.
+    \item \textbf{tracking\_set} : Dictionnaire reliant expressions et identifiants d'allocation.
+    \item \textbf{free\_tracking\_set} : Ensemble de fonctions libératrice de mémoire.
+    \item \textbf{free\_set} : Ensemble d'identifiants d'allocation libérés.
+    \item \textbf{register\_var\_counter} : Compteur d'identifiant d'allocation
+    \item \textbf{positive\_results} : Ensemble des chemins menant à une vulnérabilité repertorié durant cette passe.
+    \item \textbf{pre\_analyze} : Dictionnaire contenant différentes informations sur chacune des fonctions déjà visitées. Optimisation.
+    \item \textbf{stack\_arguments} : Arguments placés sur la pile jusque là.
+    \item \textbf{marked} : Dictionnaire reliant les noeuds du graphe au nombre d'execution symbolique de ce noeud sur un chemin. Optimisation.
+    \item \textbf{loop\_mark} : Dictionnaire reliant un noeud au \textbf{tracking\_set} lors de sa dernière visite. Optimisation.
+    \item \textbf{useless\_branches} : Dictionnaire reliant un noeud aux differents branchement qui n'ont aucune conséquence sur l'analyse. Optimisation.
+\end{itemize}
+
+\myparagraph{Modification du comportement par default de Miasm}
+
+
+\myparagraph{Explosion de chemin et Optimisation de boucles}
+\myparagraph{Appel de fonctions}
+\myparagraph{Pre-Analyse}
+\myparagraph{Traitement parralèle ou continu}
+\myparagraph{Optimisation Python : \_\_slots\_\_}
 
 \section{Interprétation et critique des résultats}
 \subparagraph{}
