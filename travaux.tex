@@ -151,7 +151,7 @@ Comme évoquée dans la section précédente de ce rapport, une analyse statique
 longue et très demandante en ressources. Les connaissances en début de stage sur le sujet étant limitées,
 une phase d'apprentissage étant indispensable (retirant donc du temps de développement), l'ambition du stage
 a donc été revue en conséquence.
-\subparagraph
+\subparagraph{}
 Plusieurs objectifs étaient fixés concernant la globalité du projet:
 \begin{itemize}
         \item Une montée en compétence sur le sujet
@@ -375,6 +375,9 @@ représentation, et re-coder une traduction de chaque objet pour un solveur part
 Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ainsi que les comparaisons faites seront résumés à la fin.
 
 \myparagraph{Angr}
+\begin{center}
+\includegraphics[scale=0.3]{angr.png}
+\end{center}
 Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
 Il permet de charger un binaire et d'avoir une représentation binaire de ce binaire en utilisant sa propre représentation intermédiaire, \textbf{VEX}.
 Il dispose également d'un moteur d'execution symbolique et est très complet dans ses fonctionnalités, permettant de récupérer pleins d'information via
@@ -384,6 +387,9 @@ En terme de maturité, le projet a vite atteint une autre dimension, et ses util
 binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques (AMD64, MIPS, ARM, ...).
 
 \myparagraph{Miasm}
+\begin{center}
+\includegraphics[scale=0.3]{cea.png}
+\end{center}
 Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
 Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
 cependant externe, l'outil traduisant juste la représentation intermédiaire vers un langage compréhensible par le très connu Z3 de Microsoft.
@@ -392,7 +398,10 @@ Un des désavantage de Miasm est ses fortes dépendances envers un nombre élev�
 quasi-inexistante.
 
 \myparagraph{Capstone}
-Capston\footnote{http://www.capstone-engine.org/} est la star montante du monde de la retro-ingéniérie. En plus d'une communauté gigantesque et d'une
+\begin{center}
+\includegraphics[scale=0.3]{capstone.png}
+\end{center}
+Capstone\footnote{http://www.capstone-engine.org/} est la star montante du monde de la retro-ingéniérie. En plus d'une communauté gigantesque et d'une
 documentation bien construite, de nombreux projets se basent déjà sur son architecture. De plus, le projet est plutôt jeune, ce qui permets d'avoir des
 dépendances recentes. La plupart des distributions ont de toute manière des paquets déjà prêt pour une installation simplifié.
 \subparagraph{}
@@ -564,7 +573,7 @@ Ensuite, on supprime si présent la destination de l'ensemble d'expressions traq
 réinitialisée. Si la source dépend d'un bloc connu, on met à jour le dictionnaire.
 \subparagraph{}
 Selon la fonction appellé, on peut soit ajouter un nouveau bloc, soit en libérer un, soit ne rien faire.
-\paragraph{Tainte}
+\myparagraph{Tainte}
 Ce principe de tainte est excesssivement utilisé dans l'analyse de binaire ou de programme. Le principe est simple, intuitif et plutôt modulaire selon l'analyse, il n'y aura
 donc pas d'explication détaillé de son fonctionnement dans ce rapport. Néanmoins les notions de base sont les suivantes:
 \begin{itemize}
@@ -630,21 +639,219 @@ Les attributs principaux sont:
     \item \textbf{free\_set} : Ensemble d'identifiants d'allocation libérés.
     \item \textbf{register\_var\_counter} : Compteur d'identifiant d'allocation
     \item \textbf{positive\_results} : Ensemble des chemins menant à une vulnérabilité repertorié durant cette passe.
-    \item \textbf{pre\_analyze} : Dictionnaire contenant différentes informations sur chacune des fonctions déjà visitées. Optimisation.
+    \item \textbf{pre\_analyze} : Dictionnaire contenant différentes informations sur chacune des fonctions déjà visitées. \textit{Optimisation}.
     \item \textbf{stack\_arguments} : Arguments placés sur la pile jusque là.
-    \item \textbf{marked} : Dictionnaire reliant les noeuds du graphe au nombre d'execution symbolique de ce noeud sur un chemin. Optimisation.
-    \item \textbf{loop\_mark} : Dictionnaire reliant un noeud au \textbf{tracking\_set} lors de sa dernière visite. Optimisation.
-    \item \textbf{useless\_branches} : Dictionnaire reliant un noeud aux differents branchement qui n'ont aucune conséquence sur l'analyse. Optimisation.
+    \item \textbf{marked} : Dictionnaire reliant les noeuds du graphe au nombre d'execution symbolique de ce noeud sur un chemin. \textit{Optimisation}.
+    \item \textbf{loop\_mark} : Dictionnaire reliant un noeud au \textbf{tracking\_set} lors de sa dernière visite. \textit{Optimisation}.
+    \item \textbf{useless\_branches} : Dictionnaire reliant un noeud aux differents branchement qui n'ont aucune conséquence sur l'analyse. \textit{Optimisation}.
 \end{itemize}
+L'utilité et le fonctionnement des attributs avec la marque \textit{optimisation} seront expliqué dans une prochaine partie.
+\subparagraph{}
+L'objet scanner étant un objet qui sera souvent ammené à être copié, les attributs sont réduits aux maximums. Quand cela est possible, une passe est faite sur
+ces attributs pour les factoriser. Par exemple, un attribut auxilliaire, \textbf{path}, qui désigne les noeuds actuellement parcouru sur le chemin, subit un traitement
+à chaque ajout pour factoriser les boucles se repetant plus de deux fois.
+\subparagraph{}
+Pour des soucis de parallèlisme, qui sera expliqué plus en détail par la suite, certains attributs ne peuvent pas être externalisés au scanner. Ils doivent faire partie
+intégrante de l'objet pour garder leur êtat. Ceci pose un problème d'espace mémoire copié inutilement, mais il n'est malheuresement pas possible de faire autrement avec
+la technique de parallèlisme utilisé et le fonctionnement interne de Python. C'est par exemple le cas de \textbf{register\_var\_counter} qui devrait faire partie du moteur de tainte.
 
 \myparagraph{Modification du comportement par default de Miasm}
+Le désassemblage et l'execution symbolique de Miasm fonctionne de manière plus ou moins satisfaisante dans la plupart des cas. Néanmoins,
+certains comportement ne convenait pas à l'analyse présentée dans ce rapport. Deux sont à noté: les appels de fonctions lors de l'execution symbolique ainsi que
+la récupération des symboles.
+\subparagraph{Récupération des symboles}
+Dans sa conception, Miasm utilise un autre projet, \textbf{Elfesteem}, qui permet d'extraire les informations de binaire de type PE ou ELF. Elfesteem permet notamment
+de récupérer les sections (dossier/table) dans les formats ELF (PE). Les deux formats peuvent stocker des symboles, qui ne sont que des noms associés à une valeur.
+Dans le cas des fonctions externes au programme, dans le format ELF par exemple, les sections \textbf{.symtab} et \textbf{.plt} permettent de faire la liaison entre un appel de fonction
+externe et son adresse. Si les symboles internes sont également gardés lors de la compilation, on peut également les utiliser pour avoir une analyse plus claire et plus facile à interpreter lors
+de déboguage.
+\subparagraph{}
+Cependant, Miasm n'annotte pas le graphe avec les informations présentes dans le binaire. Il a donc été necessaire de modifier le comportement lors du desassemblage afin que le graphe se construisent
+en se basant sur ces données.
 
+\subparagraph{Appels de fonction et execution symbolique}
+\begin{center}
+\includegraphics[scale=0.3]{ir.png}\newline
+\end{center}
+L'execution symbolique est faite pour que l'abstraction se fasse automatiquement et que les valeurs soient constamment à jour sans travail nécessaire de la part de l'utilisateur. Avec les appels de
+fonctions (notamment externes) plusieurs problèmes se posent.
+\begin{itemize}
+    \item Lors des instructions comme \textit{EAX = call\_func\_ret(...)}, EAX est automatiquement assigné à la valeur ExprOp(call\_func\_ret(...)). Si la fonction est interne et que
+    son execution est possible, EAX sera de toute manière bien assigné à une vraie valeur de retour. Le fait d'executer l'instruction donnée en exemple remplace cette bonne valeur par quelque
+    chose d'imprecis.\newline
+    Il suffit d'ignorer les instructions de ce genre si la fonction appellé est executable symboliquement (si sa representation intermediaire est disponible).
+    \item De la même manière l'instruction utilisant ESP peut conduire dans des situations non désirable. Lorsqu'une fonction est sur le point d'être appellée, Miasm effectue de lui même le décalage de la pile pour permettre de stocker le pointeur d'instruction de retour.\newline
+    Néanmoins dans certaines conventions d'appel, c'est la fonction appellée et non la fonction appellante qui doit nettoyer la pile. Si la fonction est externe, le second décalage ne se fera donc pas et il faut alors l'effectuer à la main.
+\end{itemize}
 
 \myparagraph{Explosion de chemin et Optimisation de boucles}
+Pour chaque branchement, l'analyse continue sur les branches dont la condition peut être satisfaisable (selon le solveur SMT). En x86 et dans la plupart des architectures,
+un branchement ne peut mener qu'a deux endroits au maximum. Lors d'une boucle, une lecture simpliste pourrait mener à dire que le branchement de sortie ou d'entrée dans la boucle n'est present qu'une fois.
+\subparagraph{}
+Pourtant, lors de l'execution symbolique, à chaque fois que l'on rentre dans une boucle, ce branchement sera re-rencontré une autre fois, et ainsi de suite.
+On remarque alors que l'analyse peut possiblement se diviser indéfiniment en deux, menant ainsi à ce qu'on appelle une \textit{explosion de chemins}.
+\subparagraph{}
+Pour palier à ce problème, tout en gardant une analyse correcte, il faut trouver un moyen d'éviter de parcourir une boucle lorsque ceci est inutile. Cela est possible grace à plusieurs heuristiques:
+\begin{itemize}
+    \item Le \textbf{tracking\_set} du scanner n'a pas changé depuis son dernier passage, l'analyse deviant invariante.
+    \item Le noeud suivant sur la branche a déjà été executé un nombre excessif de fois dans le contexte courant (dans la même boucle).
+    \item La boucle courante est une boucle infinie volontaire (par exemple un serveur recevant les demandes de clients). On peut quitter l'analyse au bout d'un certain temps.
+\end{itemize}
+\subparagraph{}
+L'algorithme suivant essayer de déterminer un \textit{point fixe} dans l'analyse. C'est à dire que ré appliquer l'analyse avec le contexte courant sur cette branche serait
+égal à ce qui a déjà été fait.
+\begin {lstlisting}[frame=single]
+# Si le bloc a deja ete visite
+if start in scanner.marked:
+    if scanner.marked[start] > LIMIT_VISIT_NODE:
+        return
+    # Si le bloc est deja marque comme present dans
+    # une boucle
+    if start in scanner.loop_mark:
+        # Si la derniere analyse a produit le meme
+        # contexte que la passe courante
+        if scanner.loop_mark[start] == scanner.tracking_set:
+            # On recupere le noeud precedent et on
+            # precise que le branchement entre ce noeud
+            # et le noeud courant est devenu inutile
+            scanner.useless_branches[previous(start)].add(start)
+
+    [...]
+
+if next not in scanner.useless_branches[start]
+        and not in_infinite_loop(start):
+    go_to_next_basic_block()
+\end{lstlisting}
+Sans ces heuristiques là, l'analyse est quasi certaine de boucler indéfiniment. La comparaison du contexte dans le pseudo-code est également simplifiée pour des soucis de lisibilité.
+Imaginons que l'analyse passe dans une boucle ou un objet est alloué, utilisé, ppuis supprimé (un envoie de message sur le réseau par exemple). Les deux contextes
+ne seront pas scritement égaux. C'est à dire que l'identifiant d'allocation contenu dans les mêmes zones mémoire seront décalés.
+\subparagraph{}
+On peut prendre en compte se phénomène en ne prenant pas uniquement en compte les identifiants d'allocations, mais également une possible \textit{traduction}:
+\begin{enumerate}
+    \item On vérifie que l'on retrouve les mêmes éléments taintés dans les deux contextes c1 et c2.
+    \item Pour chaque élément dans c1, on regarde si l'identifiant d'allocation i1 dans c2 est le même i2 (i1 == i2), si oui, on passe au suivant.
+    \item Si non, on vérifie que tous les éléments taintés dans c1 avec le même identifiant i1 ai la même traudction i2 dans c2.
+\end{enumerate}
+\subparagraph{}
+Certains identifiants ne sont également pas pris en compte dans la comparaison. En effet, le registre contenant la valeur de retour d'une fonction peut géner la comparaison
+lorsqu'il est assigné en fin de boucle. Les drapeaux (\textbf{EFLAGS}) sont également non compris dans toute l'analyse (la durée entre leur assignation et leur utilisation étant généralement d'une
+ou deux instructions machine).
+
+
 \myparagraph{Appel de fonctions}
+Lorsqu'une fonction est appellé, le scanner lance l'analyse avec le contexte courant sur le premier noeud de cette fonction. Comme une analyse classique, celle de la fonction peut se diviser
+en plusieurs lorsqu'un branchement est rencontré. On se retrouve donc possiblement avec plusieurs chemins retournant de cette fonction. Afin de différencier chacun de ces chemins (et donc contexte),
+un appel à une fonction accumule les retours de l'analyse. Une fois tous les retours obtenus, tous les contextes retournant sont lancé sur le noeud suivant.
+\subparagraph{}
+\begin {lstlisting}[frame=single]
+void g(int *a)
+{
+    // g1
+    if (*a == 3)
+        // g2
+        *a = 4;
+    else
+        // g3
+        *a = 3;
+}
+
+void f(void)
+{
+    // f1
+    int a = rand();
+    g(&a);
+    if (a == 3)
+        // f2
+        puts("a == 3");
+    else
+        // f3
+        puts("a != 3");
+}
+\end{lstlisting}
+Dans l'exemple suivant:
+\begin{enumerate}
+    \item le chemin f1-() appelle g()
+    \item le chemin f1-g1-() se sépare en deux.
+    \item En retour de g(), deux chemins et contextes sont retournés :
+    \begin{itemize}
+        \item f1-g1-g2-()
+        \item f1-g1-g3-()
+    \end{itemize}
+    \item Ces deux chemins continuent leurs analyses. Le branchement crée donc :
+            \begin{itemize}
+                \item f1-g1-g2-f2-()
+                \item f1-g1-g2-f3-()
+                \item f1-g1-g3-f2-()
+                \item f1-g1-g3-f3-()
+            \end{itemize}
+\end{enumerate}
+Possiblement, plusieurs contextes retournés par une fonction seront égaux. Si cela est le cas,
+ces cas là sont rassemblés en un seul pour éviter de l'encombrement spatial et temporel inutile.
+
 \myparagraph{Pre-Analyse}
+Comme vu au chapitre précédent, appeller une fonction peut être lourd pour le traitement. Optimiser le retour
+ou l'appel de ces foncitons est primordiale pour éviter d'utiliser trop de ressource ou bien pour raccourcir la durée de traitement.
+Concernant l'appel, une question simple permet d'optimiser rapidement l'ensemble: est ce qu'appeller cette fonction aura un impact sur le contexte courant.
+
+\subparagraph{}
+Une fonction peut possiblement modifier le contexte si:
+\begin{itemize}
+    \item Elle contient un appel à une fonction allocatrice.
+    \item Elle contient un appel à une fonction libératrice.
+    \item Elle modifie une variable globale possiblement taintée.
+\end{itemize}
+Une pre-analyse ressemble fortement à l'analyse concrète présentée plus tôt, à ceci près qu'aucune execution symbolique n'est faite, aucune information n'est stockée
+tout au long du chemin. Une fois qu'un des trois critères est rencontrée, la pre-analyse se termine directement et son resultat est retourné.
+Si un appel de fonction a lieu durant la pre-analyse, la fonction appellée est pré-analysée à son tour, etc.
+\subparagraph{}
+Ces informations ne changent pas selon le contexte, par conséquent, ces resultats peuvent être stocké globalement et utilisé par tous les objets scanner
+durant leurs analyses. Néanmoins, pre-analyser toutes les fonctions au lancement de l'outil peut être très consommateur, et possiblement inutile. En conséquence,
+ce principe est soumis à ce qu'on appelle l'\textit{evaluation feignante} (\textit{lazy evaluation}). Une fonction n'est pré-analysée que lorsqu'elle est appellée pour la première fois.
+Une fois cette pre-analyse faite, le pilote, gouvernant tous les chemins, stocke le resultat, et le transmet au prochain chemin en cours d'analyse. Ce principe permet de garder une base
+commune et légère au possible.
+
 \myparagraph{Traitement parralèle ou continu}
-\myparagraph{Optimisation Python : \_\_slots\_\_}
+Comme dit plusieurs fois auparavant, une analyse peut se diviser. Chacune de ses divisions crée un nouveau travail (job). Ces travaux sont stockés dans une file d'attente
+puis executés. Le problème reste à savoir si plusieurs analyses auront lieu en même temps ou non. Plus le nombre travaux se réalisant en parralèle est grand, plus l'empreinte en mémoire de l'outil
+est grande. Plus ce nombre est petit, plus l'analyse globale est lente. Il s'agit donc d'un compromis entre les ressources disponibles et le temps alloué à l'analyse. Une option de l'outil permet
+de régler cela.
+\subparagraph{Le parralèlisme en Python}
+Dans la plupart des languages, la solution aurait été le multi-threading. Néanmoins, en Python, certains interpréteurs (dont le plus utilisé CPython) utilisent le Global Interpreter Lock (GIL).
+Ce verrou sur les ressources empéche l'execution en parallèle lorsqu'une même ressource est utilisée, même si l'utilisateur est conscient de l'environnement multi-threadé et a donc mis en place
+des mecanismes contre les problèmes de concurrence. Pour les programmes effectuant beaucoup d'entrée-sortie, cela n'est pas un problème. En revanche, pour les programmes utilisant majoritairement
+le processeur et les mêmes ressources, l'interet du multi-thread est moindre.
+\subparagraph{}
+Reste en conséquence le multi-processus. Là où plusieurs threads partagent la même mémoire virtuelle, différents processus ont chacun leur espace mémoire reservé. De plus,
+afin de mieux gérer les travaux réalisé, l'outil fait appel à un bassin de processus en attente à qui l'on confie un travail à la fois. Ce bassin est initialisé au lancement,
+et par conséquent, tous les modules pythons sont initialisé séparement. C'est d'ailleurs pour cela que certains attributs font parti de l'objet copié dans le bassin au lieu d'être
+un attribut de module, comme pour le moteur de tainte. En effet un contexte n'est pas toujours assigné au même processus, et donc n'a plus le même état de l'attribut.
+Le schéma ci-dessous, tiré de Wikipedia, reprend le même concept mais avec des threads.
+\includegraphics[scale=0.5]{threadpool.png}\newline
+\myparagraph{Selection des symboles et utilisation}
+La suite de l'outil est composée : du scanner en lui même et d'un selectionneur de symboles.
+Le selectionneur prend en paramètre le chemin vers un fichier binaire, et propose à l'utilisateur de choisir, parmis les symboles accessibles au sein du programme,
+lesquels sont allocateurs et lesquels sont libérateurs. Il permet également de sauvegarder dans un fichier ces choix dans le même format que celui pris par le scanner.
+\textbf{TODO TODO INSERT IMAGE TODO TODO}
+\subparagraph{Le Scanner}
+Le fichier \textbf{parse.py} est le point d'entrée de l'outil. Il permet d'afficher le graphe relatif à un programme, de personnaliser les fonctions traquées, ainsi que de préciser
+le point d'entrée de l'analyse.
+\textbf{TODO TODO INSERT IMAGE TODO TODO}
+Les journaux de déboguage sont affichés sur la sortie d'erreur du programme. Le résultat final est affiché quand à lui sous forme de rapport sur la sortie standard à la fin de l'execution.
+\textbf{TODO TODO INSERT IMAGE TODO TODO}
+\myparagraph{Acompplissement annexes}
+Miasm et Elfesteem sont deux projets sur lesquels se reposent l'outil présenté dans ce rapport. Miasm comportait quelques comportement ne satisfaisant pas à l'utilisation qui en été faite,
+il a été proposé plusieurs corrections/améliorations/changements à son auteur. Dans l'absence de réponse, un clone du projet a été créé et est disponible publiquement avec les changements.
+Elfesteem quant à lui comportait un problème lors de l'analyse de binaire 64bits au format ELF. À un certain endroit, un pointeur 32bits étaient attendu par Elfesteem alors que le format
+exige un pointeur 64bits. La correction a été acceptée et intégré au code source.
 
 \section{Interprétation et critique des résultats}
+Malgré un travail qui n'est pas fini parfaitement, les fonctionnalités actuelles sont satisfaisantes et couvrent un large domaine, surtout pour les bases quasi-nulles de début de stage.
+Même si la prise en main de Miasm a été laborieuse, du fait du manque de documentation et de certains non-sens selon moi, et qu'Angr semble finalement beaucoup plus approprié, il n'y a pas
+d'astuces peu conventionnelle. C'est à dire que l'ensemble des corrections sont propres et ne se basent pas sur des modifications internes importante.
+\subparagraph{}
+L'analyse en sécurité demande une connaissance approfondie du language utilisé, et malgré de bonnes bases, certains comportement de Python (GIL, \_\_slots\_\_) ont demandé du temps de comprehension
+et ont été parfois un obstacle au bon developpement de l'outil.
+\subparagraph{}
+L'ensemble est assez documenté et commenté pour permettre une reprise du travail effectué  dans le futur. Une partie du développement a également été réservée pour prendre
+soin de découper le projet en fonction indépendante et modulable, d'éviter la surcharge et de faciliter la compréhension.
 \subparagraph{}
