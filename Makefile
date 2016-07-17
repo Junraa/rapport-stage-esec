@@ -1,4 +1,4 @@
-SRC=main.tex presentation-entreprise.tex conclusion.tex travaux.tex introduction.tex orga.tex
+SRC=main.tex presentation-entreprise.tex conclusion.tex travaux.tex introduction.tex orga.tex resume.tex
 
 all: rapport.pdf
 

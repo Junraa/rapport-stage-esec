@@ -1,0 +1,35 @@
+\section*{Résumé du stage}
+Ce stage de fin d'étude s'est effectué au sein de l'European Security Expertise Center de Sogeti, filliale à 100\% Capgemini, du 2 Février 2016 jusqu'au 8 Aout 2016, dans
+l'équipe de test de pénétration dont le maitre de stage, Adrien Fay, fait parti. Le stage a consisté en la mise en place d'un outil d'analyse statique de binaire pour la recherche
+de vulnérabilité de type use-after-free, en utilisant le langage de programmation Python.
+\subparagraph{}
+La première partie du stage a constitué la phase d'apprentissage et d'état de l'art des exploitation de ces vulnérabilitiés, des modules d'un système d'exploitation associé, ainsi que des solutions
+existantes pour y remédier. Cette étude a porté tout d'abord sur la généralité de ce type de vulnérabilité ainsi que sur son histoire (ce qui a poussé à l'exploitation de ces vulnérabilités, et leur
+exploitabilité de nos jours).
+\subparagraph{}
+Les recherches ont ensuite été dirigés vers les allocateurs mémoires, premièrement sur Linux avec le malloc de la bibliothèque standard et celui d'autres bibliothèques
+utilisé fréquemment, pour finir sur la gestion de la mémoire dans sa globalité sur Windows. Cette partie a mené à l'étude des principes anti-fragmentation de Windows, comme les look-aside lists, puis
+plus récemment le Low Fragmentation Heap. Le but étant in fine de faire la liaison entre ces mécanismes et leurs faiblesses menant à des vulnérabilités de type use-after-free.
+\subparagraph{}
+Enfin, les mécanismes contrant ces problèmes, tel que MemoryProtection ont également été étudiés. Les ressemblances et différences entre allocation sur des systèmes UNIX et Windows ont également
+été étudiées. Pour finir, ces connaissances ont été mises en pratique avec l'analyse de vulnérabilités connues sur différentes versions de Windows.
+\subparagraph{}
+La deuxième partie a consisté en la recherche de solutions existantes ainsi que d'outil de base pour commencer le projet. De nombreux projets existants ont été évalués, que ce soit pour de l'analyse statique ou dynamique. Le but étant de comprendre les problématiques liées à l'analyse statique et les possibles améliorations en s'inspirant par exemple des mécanismes d'analyses dynamiques.
+La lecture d'article universitaire ou de recherche a également été utilisé pour comprendre comment les outils existants fonctionnaient.
+\subparagraph{}
+Concernant les outils de base, une comparaison avec les critères et objectifs établis en début de stage a eu lieu entre les différentes grandes suites d'analyse binaire pour la sécurité. Parmi ces critères:
+\begin{itemize}
+\item support des architectures x86 et ARM
+\item support des formats binaire PE et ELF
+\item Python et compatibilité sur Windows et Linux
+\end{itemize}
+\subparagraph{}
+La troisième et dernière partie a constitué le développement en lui même. En commençant par une réflexion sur la modélisation de l'outil, afin de s'assurer une assez grande modularité dans le
+traitement, le développement a ensuite mené à la mise en place d'un squelette, ce qui a permis de prendre en main Miasm (la base choisie). En parallèle, l'outil était également documenté et testé
+au fur et à mesure.
+\subparagraph{}
+Une fois le squelette en place et le traitement/détection de base en place, l'optimisation a demandé une nouvelle phase de recherche, plutôt orienté sur la théorie des graphes ainsi que le
+fonctionnement optimal des solveur SMT et des moteurs d'exécution symbolique.
+\subparagraph{}
+Pour finir, l'outil a été testé sur des solutions plus grosses, ce qui a mené à la découverte de bogues ou de situations non prévues. La fin du stage a donc été reservé à la résolution de
+ces problèmes.
