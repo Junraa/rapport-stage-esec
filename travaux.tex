@@ -1,7 +1,4 @@
 \chapter{Cahier des charges}
-\section*{Chronogramme}
-\begin{center}
-\end{center}
 \section{Remise en contexte}
 \myparagraph{Les vulnérabilités de type Use-After-Free}
 \subparagraph{}
@@ -16,14 +13,14 @@ faisant son œuvre, la grande majorité ont été reportées sur les solutions l
 mais également parce que de nombreux outils pouvant les détecter rapidement (parfois dès la compilation)
 ont été conçus.\subparagraph{}
 Les attaquants explorent donc de nouvelles voies, notamment sur des problématiques plus dynamiques, et/ou
-lié également à l'environnement de production du programme, comme le système d'exploitation ou la bibliothèque utilisée.
+liées également à l'environnement de production du programme, comme le système d'exploitation ou la bibliothèque utilisée.
 En effet, de nombreuses opérations du programme dépendent intrinsèquement du système d'exploitation sous-jacent et
 même si le comportement final reste souvent le même sur les différentes plateformes, les effets collatéraux
 sur le contexte et le mécanisme d'exécution est souvent différent.\subparagraph{}
 
 \subparagraph{L'évolution des vulnérabilités de type use-after-free}
 \includegraphics[scale=0.5]{histogramme-uaf.png}\newline
-Beaucoup de problème de corruption mémoire sont directement dû à la mauvaise utilisation
+Beaucoup de problèmes de corruption mémoire sont directement dûs à la mauvaise utilisation
 du langage utilisé pour le développement. En effet, les langages de programmation tels que C
 ou C++ demandent une gestion de la mémoire manuelle (le C++ permet néanmoins une gestion plus ou moins automatisée
 avec les nouveaux standards).
@@ -56,10 +53,10 @@ Cela est directement dû à l'algorithme d'allocation mémoire de la bibliothèq
 C.\subparagraph{}
 En effet lors du premier appel à la fonction \textbf{malloc()}, une première zone est allouée.
 Lors de sa libération, la zone libérée est mise en cache, et lors du second appel à \textbf{malloc()},
-l'algorithme va retourner la même zone mémoire. Ce comportement ne sera pas détaillée dans cette section, car
+l'algorithme va retourner la même zone mémoire. Ce comportement ne sera pas détaillé dans cette section, car
 il demanderait à lui seul plusieurs pages.\subparagraph{}
 Cela va de soi que cet exemple est simpliste, et que les vulnérabilités rencontrées en production sont
-rarement aussi visible. Il permet toutefois de bien visualiser l'origine du problème.
+rarement aussi visibles. Il permet toutefois de bien visualiser l'origine du problème.
 
 
 \myparagraph{Outils existants en dynamique et en statique}
@@ -75,7 +72,7 @@ statiquement. Nous parlerons tout d'abord des solutions dynamiques existantes, p
 statiques, qui sont directement liées au sujet de ce stage.}
 
 \subparagraph{Kasan: Kernel Address Sanitizer}
-Kasan est un projet open-source, développée majoritairement
+Kasan est un projet open-source, développé majoritairement
 par les acteurs du noyaux Linux ainsi que par Google. Son but est d'ajouter une couche de protection
 mémoire au noyau Linux afin de détecter certains corruptions mémoires dans les opérations du noyau, comme
 des use-after-free ou des accès hors limites.
@@ -83,7 +80,7 @@ https://github.com/google/kasan
 
 \subparagraph{AddressSanitizer}
 AddressSanitizer est également un projet open-source, et effectue
-un travail similaire à Kernel Adress Sanitizer. Intégré dans la base de code de
+un travail similaire à Kernel Address Sanitizer. Intégré dans la base de code de
 LLVM, il permet, lorsque le programme testé est compilé avec les bonnes options du compilateur \textbf{Clang},
 de détecter des problèmes de mémoires.
 
@@ -102,14 +99,14 @@ L'analyse dynamique a néanmoins plusieurs défauts.\newline
 Lors de la phase de test d'une application, ainsi que lors de la recherche de vulnérabilités dans celle-ci, une bonne méthodologie
 est d'essayer de parcourir tous les chemins possibles lors de l'exécution. Cela nécessite donc plusieurs répétitions, ainsi qu'une connaissance
 pointue du programme en lui même.\newline
-Cependant, il est théoriquement impossible de parcourir tous les options possibles d'un programme, notamment si
+Cependant, il est théoriquement impossible de parcourir toutes les options possibles d'un programme, notamment si
 celui-ci dépend d'entrées utilisateurs ou de paramètre du système sur lequel il opère. Cela est d'autant plus vrai lorsque le binaire atteint une taille
 considérable. De plus, les bonnes suite de tests se font extrêmement rare au niveau professionnel.
 
 \subparagraph{Les inconvénients d'une analyse statique}
 
 Malgré le fait qu'une analyse statique autorise théoriquement le parcours de tous les chemins d'exécution existant, plusieurs obstacles
-limite parfois son utilité.\newline
+limitent parfois son utilité.\newline
 
 Les corruptions mémoires sont par nature dynamiques. Lorsqu'une allocation s'effectue, son emplacement n'est pas prédéterminé
 et plusieurs facteurs extérieurs peuvent venir gêner l'opération (absence d'espace mémoire). De plus, une allocation
@@ -124,19 +121,20 @@ d'analyse et la mémoire allouée au programme. Sur certains binaires, l'analyse
 stage, les douze giga de mémoire étaient parfois atteints.
 
 \subparagraph{}
-Lorsqu'un binaire ou sa trace d'execution possible est analysé, surtout lorsque le traitement est général et sans destination précise (c'est à dire
-qu'aucune instruction particulière dans le binaire n'est visée). On se retrouve alors face au problème d'"explosion de chemins (path explosion).
+Lorsqu'un binaire ou sa trace d'exécution possible est analysé, surtout lorsque le traitement est général et sans destination précise (c'est à dire
+qu'aucune instruction particulière dans le binaire n'est visée). On se retrouve alors face au problème d'"explosion de chemins" (paths explosion).
 
 \subparagraph{}
 Ces problématiques d'espace, d'analyse de boucles et d'optimisation de temps ont occupé une grande partie de ce stage et seront développées plus
 en détails lors des prochaines sections de ce rapport.
 
-\subparagraph{Les outils statiques existants} sont plutôt rare comparés à la masse d'analyseur dynamiques. Néanmoins certains sortent du lot.
+\subparagraph{Les outils statiques existants}
+Ils sont plutôt rare comparés à la masse d'analyseur dynamiques. Néanmoins certains sortent du lot.
 
 \subparagraph{GUEB}
 GUEB a été développé principalement par Feist Josselin durant sa thèse. Il se base sur une représentation intermédiaire
 REIL fournie par l'outil BinNavi. En se basant sur cette représentation, l'outil parcours le binaire pour retrouver des vulnérabilités
-de type use-after-free possibles.
+de type use-after-free.
 
 \section{Présentation globale du projet}
 \myparagraph{Un analyseur statique}
@@ -147,8 +145,8 @@ provenant de rapports fournis par des outils externes.
 
 \myparagraph{Ambition}
 
-Comme évoquée dans la section précédente de ce rapport, une analyse statique complète est souvent
-longue et très demandante en ressources. Les connaissances en début de stage sur le sujet étant limitées,
+Comme évoqué dans la section précédente de ce rapport, une analyse statique complète est souvent
+longue et très demandant en ressources. Les connaissances en début de stage sur le sujet étant limitées,
 une phase d'apprentissage étant indispensable (retirant donc du temps de développement), l'ambition du stage
 a donc été revue en conséquence.
 \subparagraph{}
@@ -169,9 +167,9 @@ pas à pas, et la qualité d'une fonctionnalité primait sur l'accumulation de p
 
 \subparagraph{Différence par rapport à l'existant}
 
-Quasiment toutes les solutions existantes se basent sur un rapport ou une représentation agrémentée d'informations fournis
+Quasiment toutes les solutions existantes se basent sur un rapport ou une représentation agrémentée d'informations fournies
 par un outil extérieur, effectuant déjà une première analyse, tel qu'IDA ou BinNavi. Un des premiers objectifs étaient donc de
-se baser uniquement sur une aide externe pouvant fournir le \textbf{désassemblage} du binaire ainsi qu'une \textbf{representation intermédiaire}
+se baser uniquement sur une aide externe pouvant fournir le \textbf{désassemblage} du binaire ainsi qu'une \textbf{représentation intermédiaire}
 pour plus de généricité au regard de l'architecture ciblée par le binaire.
 
 \subparagraph{Format(s) visé(s)}
@@ -196,14 +194,14 @@ juste traités comme des identifiants lors de l'analyse.
 
 \chapter{Compte-rendu d'activité}
 \section{Compréhension des allocateurs mémoire}
-Lors de son execution, un programme est chargé en mémoire et le système d'exploitation
+Lors de son exécution, un programme est chargé en mémoire et le système d'exploitation
 met à sa disposition un espace mémoire (que l'on parle de mémoire virtuelle ou physique)
 d'une certaine taille. Cet espace est découpé en plusieurs parties : les segments du programme
 (segment de code, segment de données, segment de pile, segment de tas), son tas et sa pile. Si les segment de code et de
-données et garde généralement la même taille pour le temps de l'execution, les segments de pile et de tas sont par définition
+données et garde généralement la même taille pour le temps de d'exécution, les segments de pile et de tas sont par définition
 dynamique et peuvent s'élargir ou rétrécir. Même s'il est possible d'augmenter la taille de la pile de manière dynamique (grâce
-à la fonction \textbf{alloca()} sur des systèmes UNIX par exemple), son utilisation n'est pas encouragé pour stocker des données
-dynamiques. Le tas, quand à lui, est un espace mémoire spécialement réservé pour cet emploi.
+à la fonction \textbf{alloca()} sur des systèmes UNIX par exemple), son utilisation n'est pas encouragée pour stocker des données
+dynamiques. Le tas, quant à lui, est un espace mémoire spécialement réservé pour cet emploi.
 \begin{center}
 \includegraphics[scale=0.4]{memory-layout.png}\newline
 \end{center}
@@ -213,11 +211,11 @@ dynamiques. Le tas, quand à lui, est un espace mémoire spécialement réservé
 \subparagraph{Allocation sur le tas}
 Une des fonctions les plus connues des programmeurs et ingénieurs sous environnement UNIX est \textbf{malloc()} (respectivement \textbf{HeapAlloc()} sur
 environnement Windows). En effet, en espace utilisateur, cette fonction est la base de l'allocation mémoire dynamique. Comme beaucoup de fonctions
-manipulant le système d'exploitation et l'architecture sous-jacente, \textbf{malloc()} conserve son état tout au long de l'execution et répertorie les
-changements dans des données réservés à son utilisation (première zone libre, pointeurs sur une structure de base, etc...).
+manipulant le système d'exploitation et l'architecture sous-jacente, \textbf{malloc()} conserve son état tout au long de l'exécution et répertorie les
+changements dans des données réservées à son utilisation (première zone libre, pointeurs sur une structure de base, etc...).
 \subparagraph{}
-Il existe de nombreuses alternatives au classique \textbf{malloc()}, provenant de bibliothèque externe et permettant de s'adapter aux besoins, voir d'améliorer les
-performance globales (\textbf{gmalloc()}, \textbf{TCmalloc()}. Néanmoins, la base de l'algorithme reste le même quelque soit la bibliothèque utilisée.
+Il existe de nombreuses alternatives au classique \textbf{malloc()}, provenant de bibliothèques externes et permettant de s'adapter aux besoins, voir d'améliorer les
+performances globales (\textbf{gmalloc()}, \textbf{TCmalloc()}. Néanmoins, la base de l'algorithme reste le même quelque soit la bibliothèque utilisée.
 
 \subparagraph{Découpage en bloc du tas}
 Pour gérer les allocations de différentes tailles, l'allocateur mémoire découpe au fur et à mesure des demandes
@@ -232,22 +230,22 @@ Un des exemples le plus courant est le suivant\footnote{http://gee.cs.oswego.edu
 \end{center}
 
 On remarque l'optimisation de l'espace pour les blocs libres. Au lieu d'utiliser de l'espace dans le cas général, qui ne servirait pas dans le cas des blocs alloués,
-on préfère placer les pointeurs vers les autres blocs libres à l'intérieur de l'espace libre. Cela amenera d'ailleurs une discussion sur la granularité des allocations dans
+on préfère placer les pointeurs vers les autres blocs libres à l'intérieur de l'espace libre. Cela amènera d'ailleurs une discussion sur la granularité des allocations dans
 les prochains paragraphes.
 \subparagraph{}
 La taille est également stockée au début et à la fin d'un bloc. Cela permet une coalescion plus simple des blocs libres. En effet quand deux blocs contigus en
 mémoire sont libres, il est possible des les réunir en un seul plus gros blocs.
 
 \subparagraph{Optimisation : cache}
-Cette algorithme a cependant des limites. Si la fréquence d'allocation est rapide, et si les tailles allouées/libérés sont très variées, on retrouve un phénomene de
+Cette algorithme a cependant des limites. Si la fréquence d'allocation est rapide, et si les tailles allouées/libérés sont très variées, on retrouve un phénomène de
 fragmentation important, et les blocs libres restant peuvent être trop petit pour une prochaine allocation, même s'ils auraient pu collectivement suffire.
 \subparagraph{}
 Pour assurer une fragmentation moins importante, la plupart ont mis au point un système de cache (look-aside lists puis Low Fragmentation Heap sur Windows, différents sur Linux).
-Le principe est simple : l'allocateur garde une liste des blocs libres d'une certaines tailles. Selon l'algorithme utilisé, les tailles pré-alloués peuvent différées.
+Le principe est simple : l'allocateur garde une liste des blocs libres d'une certaines taille. Selon l'algorithme utilisé, les tailles pré allouées peuvent différer.
 On peut découper ces stratégies de caches en deux: la refonte différé et la pré-allocation.
 
 \subparagraph{Refonte différé}
-Au lieu de faire une refonte des blocs contigus lors de la libération, les blocs sont conservés libres et indépendent, et rajouté à la liste des blocs libres de
+Au lieu de faire une refonte des blocs contigus lors de la libération, les blocs sont conservés libres et indépendants, et rajoutés à la liste des blocs libres de
 la taille correspondante. Cela dans l'espoir que les prochaines allocations utiliseront une taille proche.
 
 \subparagraph{Pré-Allocation}
@@ -255,66 +253,66 @@ Plutôt que d'attendre une libération, une partie de la mémoire initiale est p
 ne rentrant pas dans les catégories mises en cache.
 
 \subparagraph{}
-Ce principe de cache est notamment très utile dans les environnements où la même taille est alloué un très grand nombre de fois. On peut imaginer par exemple un
+Ce principe de cache est notamment très utile dans les environnements où la même taille est allouée un très grand nombre de fois. On peut imaginer par exemple un
 algorithme allouant une structure pour chacun des utilisateurs s'enregistrant sur une application, ou simplement un service allouant la même taille un très grand nombre
-de fois pour y stocker des messages. En terme de statistique, un programme a souvent un spectre de taille d'allocation réduit, ce qui a conduit à la présence systèmatique de
-cache dans les algorithmes d'allocation mémoire.
+de fois pour y stocker des messages. En terme de statistique, un programme a souvent un spectre de taille d'allocation réduit, ce qui a conduit à la présence systématique de
+caches dans les algorithmes d'allocation mémoire.
 
 
 \subparagraph{Granularité des allocations}
-Comme évoqué précedemment, la granularité des blocs alloués peut varier selon les méthodes et les allocateurs utilisés. La "granularité" d'une allocation
+Comme évoqué précédemment, la granularité des blocs alloués peut varier selon les méthodes et les allocateurs utilisés. La "granularité" d'une allocation
 correspond à une taille fixe dont la taille d'une allocation sera un multiple. En effet, même si l'utilisateur demande un bloc de 4 octets par exemple, la plupart
 des allocateurs renverront un pointeur vers une zone allouée plus grande. Cela vient de plusieurs facteurs.
 
 \subparagraph{}
 Le premier concerne les méta-données conservées à l'intérieur ou autour du bloc alloué. Comme vu dans le schéma sur le découpage classique d'un bloc mémoire,
 on retrouve plusieurs informations (comme des pointeurs en cas de blocs libres) à l'intérieur de la zone mémoire selon son état. Sur une architecture 64 bits,
-deux pointeurs represente en tout 16 octets. Ainsi, sans compter les méta-donnés entourant la zone mémoire réservée à l'utilisateur, une demande de blocs de taille
+deux pointeurs représentent en tout 16 octets. Ainsi, sans compter les méta-donnés entourant la zone mémoire réservée à l'utilisateur, une demande de blocs de taille
 inférieure à 16 octets sera tout simplement arrondie...
 \subparagraph{}
-Sur Windows ou UNIX, les appels aux allocateurs courant sont souvent reliés intriséquement aux fonctions d'allocation plus "générale" comme  \textbf{VirtualAlloc()} sur
+Sur Windows ou UNIX, les appels aux allocateurs courant sont souvent reliés intrinsèquement aux fonctions d'allocation plus "générales" comme  \textbf{VirtualAlloc()} sur
 Windows, ou \textbf{sbrk()} et \textbf{mmap()} sur UNIX. Ces fonctions ont souvent une granularité beaucoup plus grande (64 kilo octets pour \textbf{VirtualAlloc()}, 4 kilo octets
 pour \textbf{mmap()}). Les allocateurs mémoires de gérer intelligemment et de manière transparente cette espace mémoire souvent trop gros pour une simple demande.
 
 \subparagraph{Liaison avec les vulnérabilités de type Use-After-Free}
-Les optimisations présentés ci-dessous, bien qu'implémenté differement selon les systèmes et bibliothèques, ont tous un point commun.
-Implémenté naivement, elles augmentent certes la rapidité d'execution, mais ceci au prix d'une déterminisation quasi-compléte des zones allouées.
-Une des bases des vulnérabilités de types Use-After-Free est de pouvoir allouer la même zone mémoire que celle libéré plus tôt par le programme.
-Le mechanisme de cache rend cette condition rend ceci beaucoup plus facile que si les zones étaient complétement aléatoires.
+Les optimisations présentées ci-dessous, bien qu'implémentées différemment selon les systèmes et bibliothèques, ont toutes un point commun.
+Implémentées naïvement, elles augmentent certes la rapidité d'exécution, mais ceci au prix d'une déterminisation quasi-complète des zones allouées.
+Une des bases des vulnérabilités de type Use-After-Free est de pouvoir allouer la même zone mémoire que celle libérée plus tôt par le programme.
+Le mécanisme de cache rend ceci beaucoup plus facile que si les zones étaient complètement aléatoires.
 
 \subparagraph{}
-Plusieurs implémentations ont été modifiées pour palier cet effet déterministe, et de nouveaux méchanisme de libération mémoire ont également vu le jour.
-MemoryProtector, sur Windows, permet par le biais des fonctions \textbf{ProtectedFree()} de ne réellement liberer la mémoire que lorsque plus aucun pointeur
+Plusieurs implémentations ont été modifiées pour palier cet effet déterministe, et de nouveaux mécanisme de libération mémoire ont également vu le jour.
+MemoryProtector, sur Windows, permet par le biais des fonctions \textbf{ProtectedFree()} de ne réellement libérer la mémoire que lorsque plus aucun pointeur
 résidant sur la pile du programme ne pointe à l'intérieur de la zone mémoire ciblée.\footnote{http://community.hpe.com/t5/Security-Research/Efficacy-of-MemoryProtection-against-use-after-free/ba-p/6556134\#.VuEzVEL8tpg}
 
 
 \subparagraph{}
-Le sujet de stage porte toutefois sur une vulnérabilité en elle-même, et ne prends pas en compte le fait que celle-ci soit expoitable selon
+Le sujet de stage porte toutefois sur une vulnérabilité en elle-même, et ne prends pas en compte le fait que celle-ci soit exploitable selon
 le système d'exploitation, l'allocateur, etc.
 
 \section{Moteur d'execution concolique}
 \myparagraph{Pourquoi de l'execution symbolique ?}
-Un des défaults de l'analyse statique est l'absence de valeurs concrètes facilitant l'analyse. Même si c'est également
+Un des défauts de l'analyse statique est l'absence de valeurs concrètes facilitant l'analyse. Même si c'est également
 le but majeur de ce type d'analyse (la possibilité d'explorer tous les chemins), il est toujours agréable de conserver une valeur
 associée à un identifiant ou à une zone mémoire, que ce soit sur la pile, sur le tas, ou dans d'autres segments. On peut ainsi se baser
-sur ses valeurs pour évaluer la possiblité de prendre tel ou tel chemin, de réaliser des calculs, ou d'avoir tout simplement une réference en
+sur ses valeurs pour évaluer la possibilité de prendre tel ou tel chemin, de réaliser des calculs, ou d'avoir tout simplement une référence en
 matière de debug.
-\myparagraph{Les bases de l'execution symbolique}
-Ce principe d'associer une valeur non-concrète à un identifiant ou une zone mémoire est connu sous le nom d'execution symbolique. Comme son nom
-l'indique, le principe est d'initialiser la valeur à un symbole lorsqu'elle est créée, et d'executer le programme en se basant sur cette valeur initiale.
+\myparagraph{Les bases de l'exécution symbolique}
+Ce principe d'associer une valeur non-concrète à un identifiant ou une zone mémoire est connu sous le nom d'exécution symbolique. Comme son nom
+l'indique, le principe est d'initialiser la valeur à un symbole lorsqu'elle est créée, et d'exécuter le programme en se basant sur cette valeur initiale.
 Par exemple, sur x86, le registre \textbf{EAX} pourra être initialiser à la valeur \textbf{EAX\_INIT}. Ainsi une future opération \textbf{add EAX, 4} assignera
 au même registre la valeur symbolique \textbf{EAX\_INIT + 4}.
 
 \subparagraph{}
-Un moteur d'execution symbolique complet contiendra également les opérations classiques en programmation, comme le dereferencement mémoire d'une valeur
-symbolique, les opérations arithmétiques, etc. Concernant les opérations liés à la mémoire, la plupart des moteurs choississent de créer un espace associé à
-un espace mémoire concret uniquement lorsque celui-ci est addressé en écriture. Cela permet de garder une double dimension début/taille sans pourtant autant
-nécessiter une représentation exessivement volumineuse en terme de mémoire par l'outil.
+Un moteur d'exécution symbolique complet contiendra également les opérations classiques en programmation, comme le déréférencement mémoire d'une valeur
+symbolique, les opérations arithmétiques, etc. Concernant les opérations liées à la mémoire, la plupart des moteurs choisissent de créer un espace associé à
+un espace mémoire concret uniquement lorsque celui-ci est adressé en écriture. Cela permet de garder une double dimension début/taille sans pourtant autant
+nécessiter une représentation excessivement volumineuse en terme de mémoire par l'outil.
 \subparagraph{}
 Cela peut néanmoins poser problème si le programme essaye d'accéder à une
-zone non initialisé (ce qui peut être une vulnérabilité en soit pour un programme. Soit l'outil utilisé peut soit rencontrer un problème et terminer en erreur,
-ou retourner une valeur nulle. Dans certains cas d'analyse, on peut néanmoins tout simplement initialisé la mémoire si celle-ci ne l'était pas déjà à une valeur concrete
-par defaut ou bien à un symbole non utilisé ailleurs.
+zone non initialisée (ce qui peut être une vulnérabilité en soit pour un programme. Soit l'outil utilisé peut soit rencontrer un problème et terminer en erreur,
+ou retourner une valeur nulle. Dans certains cas d'analyse, on peut néanmoins tout simplement initialisé la mémoire si celle-ci ne l'était pas déjà à une valeur concrète
+par défaut ou bien à un symbole non utilisé ailleurs.
 
 \myparagraph{Concolique: un mélange de concret et de symbolique}
 Parfois, lors de l'analyse d'un programme, lorsqu'un chemin est pris par exemple, une seule valeur est possible pour tel ou tel identifiant/registre/espace mémoire.
@@ -333,17 +331,17 @@ L'analyse peut alors se séparer en deux chemins. Néanmoins, pour le chemin men
 n'a qu'une seule possibilité, la valeur 0. Certains solveurs de contraintes, dont nous parlerons dans la prochaine section, permettent d'arriver
 à des conclusions comme celle ci en gardant toutes les contraintes valables pour un chemin.
 \subparagraph{}
-Dans des cas comme celui-ci, la valeur est directement injectée dans le moteur d'execution symbolique. Ce mélange de valeur concrete et symbolique est
+Dans des cas comme celui-ci, la valeur est directement injectée dans le moteur d'exécution symbolique. Ce mélange de valeur concrète et symbolique est
 appelé \textbf{execution concolique}. Cela permet de réduire le temps de calcul des assertions (la valeur correspondante étant déjà prise en compte) et de
 réduire en mémoire la taille des expressions symboliques.
 
 
 \section{Solveurs SMT}
 \myparagraph{Contraintes associés aux chemins}
-Dans un programme, une division de l'analyse en deux est toujours dû à la même structure : une condition lié à une boucle ou à une structure de type if-then-else.
+Dans un programme, une division de l'analyse en deux est toujours dûe à la même structure : une condition liée à une boucle ou à une structure de type if-then-else.
 Cette condition sur une valeur donnée réduit (à moins que la condition ne soit sémantiquement pas correcte initialement) le champs de valeur possible pour un identifiant.
-Parfois même, la condition ou l'enchainement des conditions sur un même chemin d'execution est assez restrictive pour ne donner qu'une seule valeur possible.
-Même si cela peut paraitre evident pour une analyse manuelle, il peut être délicat de résoudre ces contraintes sans aide extérieur. C'est donc le but de ce qu'on appelle : les \textbf{solveurs SMT}.
+Parfois même, la condition ou l'enchainement des conditions sur un même chemin d'exécution est assez restrictive pour ne donner qu'une seule valeur possible.
+Même si cela peut paraitre évident pour une analyse manuelle, il peut être délicat de résoudre ces contraintes sans aide extérieure. C'est donc le but de ce qu'on appelle : les \textbf{solveurs SMT}.
 \subparagraph{}
 Un \textbf{solveur SMT} (Satisfiabilité Modulo Théories) permet de résoudre un ensemble de contrainte exprimé dans la logique premier ordre. Ce type de solveur peut décider
 de la solvabilité ou non de cet ensemble de contrainte. Cela permet, par exemple lors de l'analyse statique, de ne pas prendre un chemin dont les valeurs associés n'auraient
@@ -351,25 +349,25 @@ de sens d'un point de vue relationnel.
 \subparagraph{}
 Pour un chemin dont les contraintes sont satisfaisables selon le solveur SMT, ce même solveur peut fournir un modèle. Ce modèle represente l'ensemble des valeurs possibles
 pour les variables rentrant en jeu dans les contraintes. Lorsque plusieurs valeurs sont possibles, on peut au choix et selon le but de l'analyse, sauvegarder les contraintes
-en esperant de futures conditions plus restrictives, ou assigner un des ensembles de valeurs à nos identifiants symboliques.
+en espérant de futures conditions plus restrictives, ou assigner un des ensembles de valeurs à nos identifiants symboliques.
 
 
 
 \section{Choix d'implémentation: outils de décompilation}
 \myparagraph{Critères de sélection}
-Pour réaliser le sujet de stage, en dehors du language de programmation en lui-même, un ou plusieurs outils effectuant
+Pour réaliser le sujet de stage, en dehors du langage de programmation en lui-même, un ou plusieurs outils effectuant
 un pré-traitement sur l'entrée était nécessaire. En effet, la solution finale prend en entrée un programme binaire et un point
 d'entrée. Il n'était pas concevable d'effectuer le traitement sur du binaire, ou d'effectuer une analyse différentes selon le format
-et l'architecture visée par le binaire (les instructions étant différentes).
+et l'architecture visés par le binaire (les instructions étant différentes).
 \subparagraph{}
 Un moteur d'execution symbolique est également de mise. Il représente à lui seul une grosse partie de l'analyse statique permettant de
 garder en mémoire les valeurs des identifiants par rapport à leur valeur d'origine. Un solveur SMT permet également de réduire le nombre
 de chemins possibles et réduit souvent drastiquement le problème d'explosion de chemins.
 \subparagraph{}
 Il a donc fallu chercher un ou plusieurs outils de base, pouvant effectuer la décompilation du binaire puis la transformation en une
-représentation intermédiaire. Heuresement, la plupart des outils libres d'analyses binaires proposent les deux, souvent de manière transparente.
-Ils proposent également leur moteur d'execution concolique associé. Le solveur SMT est la plupart du temps imposé. En effet, ce type de solveur prennent
-en entrée une syntaxe et des objets particuliers, qu'il faut traduire. Ainsi la traduction de la representation intermédiaire est intriséquement lié à cette
+représentation intermédiaire. Heureusement, la plupart des outils libres d'analyses binaires proposent les deux, souvent de manière transparente.
+Ils proposent également leur moteur d'exécution concolique associé. Le solveur SMT est la plupart du temps imposé. En effet, ce type de solveur prennent
+en entrée une syntaxe et des objets particuliers, qu'il faut traduire. Ainsi la traduction de la représentation intermédiaire est intrinsèquement liée à cette
 représentation, et re-coder une traduction de chaque objet pour un solveur particulier prendrait trop de temps pour être rentable sur la durée d'un stage.
 \subparagraph{}
 Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ainsi que les comparaisons faites seront résumés à la fin.
@@ -394,19 +392,19 @@ Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé princ
 Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
 cependant externe, l'outil traduisant juste la représentation intermédiaire vers un langage compréhensible par le très connu Z3 de Microsoft.
 \subparagraph{}
-Un des désavantage de Miasm est ses fortes dépendances envers un nombre élevés de bibliothéques externes, sur des versions parfois obsolétes. La documentation est également
+Un des désavantage de Miasm est ses fortes dépendances envers un nombre élevé de bibliothèques externes, sur des versions parfois obsolètes. La documentation est également
 quasi-inexistante.
 
 \myparagraph{Capstone}
 \begin{center}
 \includegraphics[scale=0.3]{capstone.png}
 \end{center}
-Capstone\footnote{http://www.capstone-engine.org/} est la star montante du monde de la retro-ingéniérie. En plus d'une communauté gigantesque et d'une
+Capstone\footnote{http://www.capstone-engine.org/} est la star montante du monde de la rétro-ingénierie. En plus d'une communauté gigantesque et d'une
 documentation bien construite, de nombreux projets se basent déjà sur son architecture. De plus, le projet est plutôt jeune, ce qui permets d'avoir des
-dépendances recentes. La plupart des distributions ont de toute manière des paquets déjà prêt pour une installation simplifié.
+dépendances récentes. La plupart des distributions ont de toute manière des paquets déjà prêts pour une installation simplifiée.
 \subparagraph{}
-Néanmoins, aucune représentation intermédiaire n'est directement proposé par l'infrastructure de Capstone (même si plusieurs projet comme OpenReil se sont basés
-dessus pour fournir une representation intermédiaire).
+Néanmoins, aucune représentation intermédiaire n'est directement proposée par l'infrastructure de Capstone (même si plusieurs projets comme OpenReil se sont basés
+dessus pour fournir une représentation intermédiaire).
 
 
 \myparagraph{Comparaison}
@@ -430,8 +428,8 @@ dessus pour fournir une representation intermédiaire).
     \end{tabular}
 \end{table}
 
-A l'époque à laquelle s'est déroulé cette reflexion, Angr n'avait pas vraiment été
-considéré (ce qui sera d'ailleurs considéré comme une erreur plus tard lors du bilan du stage).
+A l'époque à laquelle s'est déroulée cette réflexion, Angr n'avait pas vraiment été
+considéré (ce qui sera d'ailleurs marqué comme une erreur plus tard lors du bilan du stage).
 Miasm permettant de faire tout ce qui avait été établi lors du cahier des charges, c'est donc la suite d'outils qui fut choisie.
 Même si la documentation lui fait cruellement défaut, la plupart des exemples suffisent à prendre en main (de manière basique) l'ensemble.
 \subparagraph{}
@@ -440,42 +438,43 @@ plus finement.
 
 \section{L'analyse statique d'Use-After-Free}
 \myparagraph{Graphe d'instructions}
-Le graphe d'instructions d'un programme est représenté sous la forme d'un graphe orienté dont les noeuds rassemblent une ou plusieurs
-instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graphe relient les instructions dans leur ordre d'execution.
-Un noeud peut avoir un ou plusieurs noeuds entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
+Le graphe d'instructions d'un programme est représenté sous la forme d'un graphe orienté dont les nœuds rassemblent une ou plusieurs
+instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graphe relient les instructions dans leur ordre d'exécution.
+Un nœud peut avoir un ou plusieurs nœuds entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
 \begin{center}
 \includegraphics[scale=0.3]{condition.png}\newline
 \end{center}
 \subparagraph{}
-Cette illustration est la representation graphique d'un exemple de graphe qui sera parcouru durant l'analyse. Le graphe est parcouru \textbf{dans l'ordre},
-en partant d'un point d'entrée donné en entrée. Ce \textbf{point d'entrée} peut soit être \textbf{une adresse en hexadecimal} (0xABCDF) ou \textbf{un nom de fonction
-suivi optionnellement d'un offset hexadecimal} (main\[+0x12\]). Cette entrée doit correspondre à un \textbf{label} présent sur un des noeuds du graphes.
+Cette illustration est la représentation graphique d'un exemple de graphe qui sera parcouru durant l'analyse. Le graphe est parcouru \textbf{dans l'ordre},
+en partant d'un point d'entrée donné. Ce \textbf{point d'entrée} peut soit être \textbf{une adresse en hexadécimal} (0xABCDF) ou \textbf{un nom de fonction
+suivi possiblement d'un offset hexadécimal} (main\[+0x12\]). Cette entrée doit correspondre à un \textbf{label} présent sur un des nœuds du graphes.
 \subparagraph{}
 Durant la décompilation, Miasm découpe le programme en \textbf{\textit{basic blocks}}. Un \textit{basic blocks} est défini comme ceci :
-une suite d'instruction successive se terminant par un branchement ou un point de sortie. Cela permet de découper en fonction logique
+une suite d'instruction successives se terminant par un branchement ou un point de sortie. Cela permet de découper en fonction logique
 le programme et de le représenter sous forme de diagramme de décision. La lecture est alors plus simple, plus naturelle, et les chemins se suivent et se
 séparent logiquement, ressemblant plus à la manière dont le code source se divise que celle du code binaire/assembleur.
 \subparagraph{}
-Miasm génére également d'autres \textbf{basic blocks} lors des appels de fonctions. Ils permettent de traiter différement ces blocs, d'effectuer une pré-analyse
+Miasm génère également d'autres \textbf{basic blocks} lors des appels de fonctions. Ils permettent de traiter différemment ces blocs, d'effectuer une pré-analyse
 de la fonction, etc.
 
 \myparagraph{Representation intermédiaire de Miasm}
-Toutes les intructions de la représentation intermédiaire de Miasm sont représentés sous la forme d'une assignation : EXPR1 = EXPR2.
+Toutes les instructions de la représentation intermédiaire de Miasm sont représentés sous la forme d'une assignation : EXPR1 = EXPR2.
 L'expression de gauche étant un registre ou un espace mémoire valide, et l'expression de droite pouvant être n'importe quelle expression
-representant in fine une valeur.
+représentant in fine une valeur.
 \subparagraph{}
 En interne, les expressions sont découpés en 5 types, tous défini par une taille (généralement 32 ou 64 bits) et des arguments optionnels:
 \begin{itemize}
     \item Les ExprInt : un entier, d'une taille définie.
     \item Les ExprID : un identifiant, le plus souvent un registre.
-    \item Les ExprMem : un espace mémoire, dont l'adresse est donné par l'argument de l'expression. Cette expression peut être de n'importe quel type.
+    \item Les ExprMem : un espace mémoire, dont l'adresse est donnée par l'argument de l'expression. Cette expression peut être de n'importe quel type.
     \item Les ExprOp : une opération entre deux expressions (les opérations mathématiques classiques ainsi que les appels de fonctions).
-    \item Les ExprCond : une condition. La condition est représenté par une expression selon le même principe qu'en C. Si la valeur de l'expression est 0, la condition est fausse, sinon elle est considérée comme vraie. Une ExprCond prend également en paramètre deux expressions representant le branchement à prendre (souvent des ExprInt.
+    \item Les ExprCond : une condition. La condition est représentée par une expression selon le même principe qu'en C. Si la valeur de l'expression est 0, la condition est fausse,
+sinon elle est considérée comme vraie. Une ExprCond prend également en paramètre deux expressions représentant le branchement à prendre (souvent des ExprInt.
     \item les ExprSlice et ExprComp : composition et décomposition de une ou plusieurs emplacements selon un nombre de bits précis.
 \end{itemize}
 En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
 \begin{itemize}
-    \item Pour le \textit{basic block} \textbf{main+0x23}, la premiere instruction (\textbf{ExprMem}) assigne à l'emplacement désigné par \textbf{l'adresse}
+    \item Pour le \textit{basic block} \textbf{main+0x23}, la première instruction (\textbf{ExprMem}) assigne à l'emplacement désigné par \textbf{l'adresse}
         présente dans \textbf{ESP} la valeur \textbf{0x4}.
     \item Les blocs se finissent tous par une assignation de l'identifiant \textbf{IRDst}, indiquant le prochain basic blocs dans l'execution.
         En l'occurence, toutes les assignations de cet exemple sont des \textbf{ExprInt}. S'il s'agissait d'un branchement, l'expression assigné à \textbf{IRDst}
@@ -485,7 +484,7 @@ En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
 \includegraphics[scale=0.3]{ir.png}\newline
 \end{center}
 \subparagraph{}
-Chacune des instructions intermédiaires représente une ou plusieurs instructions du binaire ciblé. En effet, un language intermédiaire
+Chacune des instructions intermédiaires représente une ou plusieurs instructions du binaire ciblé. En effet, un langage intermédiaire
 pouvant se retrouver à travailler sur plusieurs architectures cibles, une instruction complexe sur une d'elle est retransformée en de multiples
 fragments, pouvant alors se retransformer/reassembler sur une autre architecture si besoin.
 \subparagraph{}
@@ -495,29 +494,29 @@ verra sa transformation, possiblement constitué de plusieurs instructions inter
 
 
 \myparagraph{Reconnaitre un use-after-free}
-Comme dit précedemment, un use-after-free est l'enchainement d'une allocation, d'une libération, puis de l'utilisation d'un espace mémoire.
+Comme dit précédemment, un use-after-free est l'enchainement d'une allocation, d'une libération, puis de l'utilisation d'un espace mémoire.
 \subparagraph{Allocation}
-Une \textbf{allocation} dans le sens de la présente analyse, est l'appel d'une fonction etant marquée comme \textit{allocatrice}. En reprenant les deux noeuds intermédiaires
+Une \textbf{allocation} dans le sens de la présente analyse, est l'appel d'une fonction étant marquée comme \textit{allocatrice}. En reprenant les deux noeuds intermédiaires
 du paragraphe précédent, on peut comprendre comment Miasm traduit un appel de fonction. Dans le cas présenté, il s'agissait d'une allocation en utilisant la fonction malloc,
 avec comme argument la taille d'une zone de stockage de type C \textbf{int}.
-Le registre d'instruction (ici \textbf{EIP} est mis à jour, les arguments sont placés dans les registres qui conviennnent ou bien sur la pile.
+Le registre d'instruction (ici \textbf{EIP} est mis à jour, les arguments sont placés dans les registres qui conviennent ou bien sur la pile.
 Ici \textbf{0x4} est poussé sur la pile. Le binaire décompilé étant conçu pour l'architecture x86, \textbf{ESP} est également décrémenté de \textbf{4 octets},
-et l'adresse de la prochaine instruction est stocké sur la pile également.
+et l'adresse de la prochaine instruction est stocké sur la pile.
 \subparagraph{}
-Miasm génére alors un \textit{basic block} virtuel (\textit{lbl\_gen\_X}) qui stocke la valeur de retour de la fonction (\textbf{ExrOp(call\_func\_ret)})
+Miasm génère alors un \textit{basic block} virtuel (\textit{lbl\_gen\_X}) qui stocke la valeur de retour de la fonction (\textbf{ExrOp(call\_func\_ret)})
 là où la convention d'appel du binaire le veut. Le principe suivant est appliqué:
 \begin{enumerate}
-    \item La fonction est-elle annoté \textbf{@extern} ? Si non, l'analyse continue en suivant cet appel.
+    \item La fonction est-elle annotée \textbf{@extern} ? Si non, l'analyse continue en suivant cet appel.
     \item La fonction est-elle traquée comme allocatrice ? Si oui, la valeur de retour ainsi que le registre servant à la stocker sont mémorisés.
 \end{enumerate}
 
 \subparagraph{Libération}
-En suivant le même principe que pour l'allocation, si une fonction est marqué comme libératrice, si ses arguments sont mémorisés comme faisant reference
-à une zone mémoire précedemment allouée, cette zone est marqué comme libre.
+En suivant le même principe que pour l'allocation, si une fonction est marquée comme libératrice, si ses arguments sont mémorisés comme faisant référence
+à une zone mémoire précédemment allouée, cette zone est marquée comme libre.
 
 \subparagraph{Utilisation}
 Lors du parcours du graphe, lorsque qu'une instruction intermédiaire est analysée, si la source comprends une référence à une zone mémoire marqué comme libre,
-un UAF est détécté.
+un UAF est détecté.
 
 \myparagraph{Algorithme basique}
 L'exemple de pseudo-code ci dessous illustre l'algorithme utilisé pour la base de l'analyse.
@@ -560,32 +559,32 @@ L'algorithme utilise deux structures de données très importantes :
         \item free\_set : un ensemble des identifiants d'allocations libéré.
 \end{itemize}
 
-Chaque allocation se voit attribué un identifiant unique (\textbf{allocation\_id}). Cela permet de centraliser les informations
+Chaque allocation se voit attribuer un identifiant unique (\textbf{allocation\_id}). Cela permet de centraliser les informations
 en utilisant uniquement cet identifiant lorsque nécessaire.
 
 L'algorithme ci-dessus est du pseudo-code sur un traitement simple.
-Premièrement, le noeud courant (\textit{basic block} est récupéré du graphe. Pour chaque instructions du graphe, on évalue symboliquement
-l'expression afin de mettre à jour le moteur d'execution symbolique.
+Premièrement, le nœud courant (\textit{basic block} est récupéré du graphe. Pour chaque instructions du graphe, on évalue symboliquement
+l'expression afin de mettre à jour le moteur d'exécution symbolique.
 \subparagraph{}
 L'expression source est vérifiée afin de s'assurer qu'elle ne dépend pas d'un bloc mémoire libéré.
 \subparagraph{}
 Ensuite, on supprime si présent la destination de l'ensemble d'expressions traquées. En effet, celle ci va prendre une nouvelle valeur et est donc
 réinitialisée. Si la source dépend d'un bloc connu, on met à jour le dictionnaire.
 \subparagraph{}
-Selon la fonction appellé, on peut soit ajouter un nouveau bloc, soit en libérer un, soit ne rien faire.
-\myparagraph{Tainte}
-Ce principe de tainte est excesssivement utilisé dans l'analyse de binaire ou de programme. Le principe est simple, intuitif et plutôt modulaire selon l'analyse, il n'y aura
-donc pas d'explication détaillé de son fonctionnement dans ce rapport. Néanmoins les notions de base sont les suivantes:
+Selon la fonction appelée, on peut soit ajouter un nouveau bloc, soit en libérer un, soit ne rien faire.
+\myparagraph{Teinte}
+Ce principe de teinte est excessivement utilisé dans l'analyse de binaire ou de programme. Le principe est simple, intuitif et plutôt modulaire selon l'analyse, il n'y aura
+donc pas d'explication détaillée de son fonctionnement dans ce rapport. Néanmoins les notions de base sont les suivantes:
 \begin{itemize}
-        \item Un element de l'analyse est marqué comme tainté lors d'une procédure définie.
-        \item Lorsque cet element est en contact ou lié avec un autre element, et que cette liaison respecte certains
-            critères, cet autre element est également marqué comme tainté.
-        \item Chaque teinte doit avoir une couleur. La couleur est possiblement la même pour chaque element tainté.
+        \item Un élément de l'analyse est marqué comme teinté lors d'une procédure définie.
+        \item Lorsque cet élément est en contact ou lié avec un autre élément, et que cette liaison respecte certains
+            critères, cet autre élément est également marqué comme teinté.
+        \item Chaque teinte doit avoir une couleur. La couleur est possiblement la même pour chaque élément teinté.
 \end{itemize}
 
 \myparagraph{Architecture du scanner et objets}
 Le but de tout projet à long terme est d'être maintenable par des nouveaux arrivants, et de pouvoir s'améliorer
-sans difficulté. Cela passe par la documentation, mais également par une architecture et une conception réfléchie à l'avance
+sans difficultés. Cela passe par la documentation, mais également par une architecture et une conception réfléchie à l'avance
 et si possible modulaire.
 \subparagraph{Architecture}
 Le projet est divisé en trois parties:
@@ -595,8 +594,8 @@ Le projet est divisé en trois parties:
         \item Les optimisations de parcours du graphe.
 \end{enumerate}
 Chaque couche X est plus ou moins dépendante de la couche X-1. Néanmoins, l'inverse ne doit pas être vrai.
-Si l'analyse et le code associé commence à dépendre de la manière dont l'optimisation évolue, alors la conception commence à poser problème.
-En effet, si une optimisation prend le pas sur d'autres, on restreint les possibilités. Une phrase célébre de Donald Knuth résume d'ailleurs cette situation:
+Si l'analyse et le code associé commencent à dépendre de la manière dont l'optimisation évolue, alors la conception commence à poser problème.
+En effet, si une optimisation prend le pas sur d'autres, on restreint les possibilités. Une phrase célèbre de Donald Knuth résume d'ailleurs cette situation:
 \textit{L'optimisation prématurée est la racine de tous les maux}.
 \subparagraph{}
 Le parcours de graphe est en réalité un squelette, avec plusieurs endroits dans lesquels il est possible de faire des traitements ou optimisations. L'algorithme de base
@@ -629,79 +628,79 @@ Le projet est découpé en plusieurs modules python:
 \end{itemize}
 
 \subparagraph{L'objet Scanner}
-Un scanner est représenté par un objet Python. Il contient plusieurs propriétés et méthodes permetant de le manipuler directement.
+Un scanner est représenté par un objet Python. Il contient plusieurs propriétés et méthodes permettant de le manipuler directement.
 Les attributs principaux sont:
 \begin{itemize}
-    \item \textbf{disassemble\_callback} : Fonction à appeller pour aller récupérer un bloc dans un graphe.
+    \item \textbf{disassemble\_callback} : Fonction à appeler pour aller récupérer un bloc dans un graphe.
     \item \textbf{alloc\_tracking\_set} : Ensemble de fonctions allocatrices de mémoire.
     \item \textbf{tracking\_set} : Dictionnaire reliant expressions et identifiants d'allocation.
     \item \textbf{free\_tracking\_set} : Ensemble de fonctions libératrice de mémoire.
     \item \textbf{free\_set} : Ensemble d'identifiants d'allocation libérés.
     \item \textbf{register\_var\_counter} : Compteur d'identifiant d'allocation
-    \item \textbf{positive\_results} : Ensemble des chemins menant à une vulnérabilité repertorié durant cette passe.
+    \item \textbf{positive\_results} : Ensemble des chemins menant à une vulnérabilité répertoriée durant cette passe.
     \item \textbf{pre\_analyze} : Dictionnaire contenant différentes informations sur chacune des fonctions déjà visitées. \textit{Optimisation}.
     \item \textbf{stack\_arguments} : Arguments placés sur la pile jusque là.
-    \item \textbf{marked} : Dictionnaire reliant les noeuds du graphe au nombre d'execution symbolique de ce noeud sur un chemin. \textit{Optimisation}.
-    \item \textbf{loop\_mark} : Dictionnaire reliant un noeud au \textbf{tracking\_set} lors de sa dernière visite. \textit{Optimisation}.
-    \item \textbf{useless\_branches} : Dictionnaire reliant un noeud aux differents branchement qui n'ont aucune conséquence sur l'analyse. \textit{Optimisation}.
+    \item \textbf{marked} : Dictionnaire reliant les nœuds du graphe au nombre d'exécution symbolique de ce nœud sur un chemin. \textit{Optimisation}.
+    \item \textbf{loop\_mark} : Dictionnaire reliant un nœud au \textbf{tracking\_set} lors de sa dernière visite. \textit{Optimisation}.
+    \item \textbf{useless\_branches} : Dictionnaire reliant un nœud aux différents branchement qui n'ont aucune conséquence sur l'analyse. \textit{Optimisation}.
 \end{itemize}
-L'utilité et le fonctionnement des attributs avec la marque \textit{optimisation} seront expliqué dans une prochaine partie.
+L'utilité et le fonctionnement des attributs avec la marque \textit{optimisation} seront expliqués dans une prochaine partie.
 \subparagraph{}
-L'objet scanner étant un objet qui sera souvent ammené à être copié, les attributs sont réduits aux maximums. Quand cela est possible, une passe est faite sur
-ces attributs pour les factoriser. Par exemple, un attribut auxilliaire, \textbf{path}, qui désigne les noeuds actuellement parcouru sur le chemin, subit un traitement
-à chaque ajout pour factoriser les boucles se repetant plus de deux fois.
+L'objet scanner étant un objet qui sera souvent amené à être copié, les attributs sont réduits au minimum. Quand cela est possible, une passe est faite sur
+ces attributs pour les factoriser. Par exemple, un attribut auxiliaire, \textbf{path}, qui désigne les nœuds actuellement parcourus sur le chemin, subit un traitement
+à chaque ajout pour factoriser les boucles se répétant plus de deux fois.
 \subparagraph{}
-Pour des soucis de parallèlisme, qui sera expliqué plus en détail par la suite, certains attributs ne peuvent pas être externalisés au scanner. Ils doivent faire partie
-intégrante de l'objet pour garder leur êtat. Ceci pose un problème d'espace mémoire copié inutilement, mais il n'est malheuresement pas possible de faire autrement avec
+Pour des soucis de parallélisme, qui sera expliqué plus en détail par la suite, certains attributs ne peuvent pas être externalisés au scanner. Ils doivent faire partie
+intégrante de l'objet pour garder leur état. Ceci pose un problème d'espace mémoire copié inutilement, mais il n'est malheureusement pas possible de faire autrement avec
 la technique de parallèlisme utilisé et le fonctionnement interne de Python. C'est par exemple le cas de \textbf{register\_var\_counter} qui devrait faire partie du moteur de tainte.
 
-\myparagraph{Modification du comportement par default de Miasm}
+\myparagraph{Modification du comportement par défaut de Miasm}
 Le désassemblage et l'execution symbolique de Miasm fonctionne de manière plus ou moins satisfaisante dans la plupart des cas. Néanmoins,
-certains comportement ne convenait pas à l'analyse présentée dans ce rapport. Deux sont à noté: les appels de fonctions lors de l'execution symbolique ainsi que
+certains comportements ne convenaient pas à l'analyse présentée dans ce rapport. Deux sont à noter: les appels de fonctions lors de l'exécution symbolique ainsi que
 la récupération des symboles.
 \subparagraph{Récupération des symboles}
 Dans sa conception, Miasm utilise un autre projet, \textbf{Elfesteem}, qui permet d'extraire les informations de binaire de type PE ou ELF. Elfesteem permet notamment
 de récupérer les sections (dossier/table) dans les formats ELF (PE). Les deux formats peuvent stocker des symboles, qui ne sont que des noms associés à une valeur.
 Dans le cas des fonctions externes au programme, dans le format ELF par exemple, les sections \textbf{.symtab} et \textbf{.plt} permettent de faire la liaison entre un appel de fonction
-externe et son adresse. Si les symboles internes sont également gardés lors de la compilation, on peut également les utiliser pour avoir une analyse plus claire et plus facile à interpreter lors
+externe et son adresse. Si les symboles internes sont également gardés lors de la compilation, on peut également les utiliser pour avoir une analyse plus claire et plus facile à interpréter lors
 de déboguage.
 \subparagraph{}
-Cependant, Miasm n'annotte pas le graphe avec les informations présentes dans le binaire. Il a donc été necessaire de modifier le comportement lors du desassemblage afin que le graphe se construisent
+Cependant, Miasm n'annote pas le graphe avec les informations présentes dans le binaire. Il a donc été nécessaire de modifier le comportement lors du desassemblage afin que le graphe se construisent
 en se basant sur ces données.
 
-\subparagraph{Appels de fonction et execution symbolique}
+\subparagraph{Appels de fonction et exécution symbolique}
 \begin{center}
 \includegraphics[scale=0.3]{ir.png}\newline
 \end{center}
-L'execution symbolique est faite pour que l'abstraction se fasse automatiquement et que les valeurs soient constamment à jour sans travail nécessaire de la part de l'utilisateur. Avec les appels de
-fonctions (notamment externes) plusieurs problèmes se posent.
+L'exécution symbolique est faite pour que l'abstraction se fasse automatiquement et que les valeurs soient constamment à jour sans travail nécessaire de la part de l'utilisateur. Avec les appels de
+fonctions (notamment externes), plusieurs problèmes se posent.
 \begin{itemize}
     \item Lors des instructions comme \textit{EAX = call\_func\_ret(...)}, EAX est automatiquement assigné à la valeur ExprOp(call\_func\_ret(...)). Si la fonction est interne et que
-    son execution est possible, EAX sera de toute manière bien assigné à une vraie valeur de retour. Le fait d'executer l'instruction donnée en exemple remplace cette bonne valeur par quelque
-    chose d'imprecis.\newline
-    Il suffit d'ignorer les instructions de ce genre si la fonction appellé est executable symboliquement (si sa representation intermediaire est disponible).
-    \item De la même manière l'instruction utilisant ESP peut conduire dans des situations non désirable. Lorsqu'une fonction est sur le point d'être appellée, Miasm effectue de lui même le décalage de la pile pour permettre de stocker le pointeur d'instruction de retour.\newline
-    Néanmoins dans certaines conventions d'appel, c'est la fonction appellée et non la fonction appellante qui doit nettoyer la pile. Si la fonction est externe, le second décalage ne se fera donc pas et il faut alors l'effectuer à la main.
+    son exécution est possible, EAX sera de toute manière bien assigné à une vraie valeur de retour. Le fait d'exécuter l'instruction donnée en exemple remplace cette bonne valeur par quelque
+    chose d'imprécis.\newline
+    Il suffit d'ignorer les instructions de ce genre si la fonction appelée est exécutable symboliquement (si sa representation intermédiaire est disponible).
+    \item De la même manière l'instruction utilisant ESP peut conduire dans des situations non désirable. Lorsqu'une fonction est sur le point d'être appelée, Miasm effectue de lui même le décalage de la pile pour permettre de stocker le pointeur d'instruction de retour.\newline
+    Néanmoins dans certaines conventions d'appel, c'est la fonction appelée et non la fonction appelante qui doit nettoyer la pile. Si la fonction est externe, le second décalage ne se fera donc pas et il faut alors l'effectuer à la main.
 \end{itemize}
 
 \myparagraph{Explosion de chemin et Optimisation de boucles}
 Pour chaque branchement, l'analyse continue sur les branches dont la condition peut être satisfaisable (selon le solveur SMT). En x86 et dans la plupart des architectures,
-un branchement ne peut mener qu'a deux endroits au maximum. Lors d'une boucle, une lecture simpliste pourrait mener à dire que le branchement de sortie ou d'entrée dans la boucle n'est present qu'une fois.
+un branchement ne peut mener qu'a deux endroits au maximum. Lors d'une boucle, une lecture simpliste pourrait mener à dire que le branchement de sortie ou d'entrée dans la boucle n'est présent qu'une fois.
 \subparagraph{}
-Pourtant, lors de l'execution symbolique, à chaque fois que l'on rentre dans une boucle, ce branchement sera re-rencontré une autre fois, et ainsi de suite.
+Pourtant, lors de l'exécution symbolique, à chaque fois que l'on rentre dans une boucle, ce branchement sera re-rencontré une autre fois, et ainsi de suite.
 On remarque alors que l'analyse peut possiblement se diviser indéfiniment en deux, menant ainsi à ce qu'on appelle une \textit{explosion de chemins}.
 \subparagraph{}
-Pour palier à ce problème, tout en gardant une analyse correcte, il faut trouver un moyen d'éviter de parcourir une boucle lorsque ceci est inutile. Cela est possible grace à plusieurs heuristiques:
+Pour palier à ce problème, tout en gardant une analyse correcte, il faut trouver un moyen d'éviter de parcourir une boucle lorsque ceci est inutile. Cela est possible grâce à plusieurs heuristiques:
 \begin{itemize}
-    \item Le \textbf{tracking\_set} du scanner n'a pas changé depuis son dernier passage, l'analyse deviant invariante.
-    \item Le noeud suivant sur la branche a déjà été executé un nombre excessif de fois dans le contexte courant (dans la même boucle).
+    \item Le \textbf{tracking\_set} du scanner n'a pas changé depuis son dernier passage, l'analyse devient invariante.
+    \item Le nœud suivant sur la branche a déjà été exécuté un nombre excessif de fois dans le contexte courant (dans la même boucle).
     \item La boucle courante est une boucle infinie volontaire (par exemple un serveur recevant les demandes de clients). On peut quitter l'analyse au bout d'un certain temps.
 \end{itemize}
 \subparagraph{}
 L'algorithme suivant essayer de déterminer un \textit{point fixe} dans l'analyse. C'est à dire que ré appliquer l'analyse avec le contexte courant sur cette branche serait
 égal à ce qui a déjà été fait.
 \begin {lstlisting}[frame=single]
-# Si le bloc a deja ete visite
+# Si le bloc a deja et visite
 if start in scanner.marked:
     if scanner.marked[start] > LIMIT_VISIT_NODE:
         return
@@ -723,25 +722,25 @@ if next not in scanner.useless_branches[start]
     go_to_next_basic_block()
 \end{lstlisting}
 Sans ces heuristiques là, l'analyse est quasi certaine de boucler indéfiniment. La comparaison du contexte dans le pseudo-code est également simplifiée pour des soucis de lisibilité.
-Imaginons que l'analyse passe dans une boucle ou un objet est alloué, utilisé, ppuis supprimé (un envoie de message sur le réseau par exemple). Les deux contextes
-ne seront pas scritement égaux. C'est à dire que l'identifiant d'allocation contenu dans les mêmes zones mémoire seront décalés.
+Imaginons que l'analyse passe dans une boucle où un objet est alloué, utilisé, puis supprimé (un envoie de message sur le réseau par exemple). Les deux contextes
+ne seront pas strictement égaux. C'est à dire que les identifiants d'allocation contenus dans les mêmes zones mémoire seront décalés.
 \subparagraph{}
-On peut prendre en compte se phénomène en ne prenant pas uniquement en compte les identifiants d'allocations, mais également une possible \textit{traduction}:
+On peut prendre en compte ce phénomène en ne prenant pas uniquement en compte les identifiants d'allocations, mais également une possible \textit{traduction}:
 \begin{enumerate}
-    \item On vérifie que l'on retrouve les mêmes éléments taintés dans les deux contextes c1 et c2.
+    \item On vérifie que l'on retrouve les mêmes éléments teintés dans les deux contextes c1 et c2.
     \item Pour chaque élément dans c1, on regarde si l'identifiant d'allocation i1 dans c2 est le même i2 (i1 == i2), si oui, on passe au suivant.
-    \item Si non, on vérifie que tous les éléments taintés dans c1 avec le même identifiant i1 ai la même traudction i2 dans c2.
+    \item Si non, on vérifie que tous les éléments teintés dans c1 avec le même identifiant i1 ai la même traduction i2 dans c2.
 \end{enumerate}
 \subparagraph{}
-Certains identifiants ne sont également pas pris en compte dans la comparaison. En effet, le registre contenant la valeur de retour d'une fonction peut géner la comparaison
+Certains identifiants ne sont également pas pris en compte dans la comparaison. En effet, le registre contenant la valeur de retour d'une fonction peut gêner la comparaison
 lorsqu'il est assigné en fin de boucle. Les drapeaux (\textbf{EFLAGS}) sont également non compris dans toute l'analyse (la durée entre leur assignation et leur utilisation étant généralement d'une
 ou deux instructions machine).
 
 
 \myparagraph{Appel de fonctions}
-Lorsqu'une fonction est appellé, le scanner lance l'analyse avec le contexte courant sur le premier noeud de cette fonction. Comme une analyse classique, celle de la fonction peut se diviser
+Lorsqu'une fonction est appelée, le scanner lance l'analyse avec le contexte courant sur le premier nœud de cette fonction. Comme une analyse classique, celle de la fonction peut se diviser
 en plusieurs lorsqu'un branchement est rencontré. On se retrouve donc possiblement avec plusieurs chemins retournant de cette fonction. Afin de différencier chacun de ces chemins (et donc contexte),
-un appel à une fonction accumule les retours de l'analyse. Une fois tous les retours obtenus, tous les contextes retournant sont lancé sur le noeud suivant.
+un appel à une fonction accumule les retours de l'analyse. Une fois tous les retours obtenus, tous les contextes retournant sont lancé sur le nœud suivant.
 \subparagraph{}
 \begin {lstlisting}[frame=single]
 void g(int *a)
@@ -770,7 +769,7 @@ void f(void)
 \end{lstlisting}
 Dans l'exemple suivant:
 \begin{enumerate}
-    \item le chemin f1-() appelle g()
+    \item le chemin f1-() appele g()
     \item le chemin f1-g1-() se sépare en deux.
     \item En retour de g(), deux chemins et contextes sont retournés :
     \begin{itemize}
@@ -789,47 +788,51 @@ Possiblement, plusieurs contextes retournés par une fonction seront égaux. Si 
 ces cas là sont rassemblés en un seul pour éviter de l'encombrement spatial et temporel inutile.
 
 \myparagraph{Pre-Analyse}
-Comme vu au chapitre précédent, appeller une fonction peut être lourd pour le traitement. Optimiser le retour
-ou l'appel de ces foncitons est primordiale pour éviter d'utiliser trop de ressource ou bien pour raccourcir la durée de traitement.
-Concernant l'appel, une question simple permet d'optimiser rapidement l'ensemble: est ce qu'appeller cette fonction aura un impact sur le contexte courant.
+Comme vu au chapitre précédent, appeler une fonction peut être lourd pour le traitement. Optimiser le retour
+ou l'appel de ces fonctions est primordial pour éviter d'utiliser trop de ressource ou bien pour raccourcir la durée de traitement.
+Concernant l'appel, une question simple permet d'optimiser rapidement l'ensemble: est ce qu'appeler cette fonction aura un impact sur le contexte courant.
 
 \subparagraph{}
 Une fonction peut possiblement modifier le contexte si:
 \begin{itemize}
     \item Elle contient un appel à une fonction allocatrice.
     \item Elle contient un appel à une fonction libératrice.
-    \item Elle modifie une variable globale possiblement taintée.
+    \item Elle modifie une variable globale possiblement teintée.
 \end{itemize}
-Une pre-analyse ressemble fortement à l'analyse concrète présentée plus tôt, à ceci près qu'aucune execution symbolique n'est faite, aucune information n'est stockée
-tout au long du chemin. Une fois qu'un des trois critères est rencontrée, la pre-analyse se termine directement et son resultat est retourné.
-Si un appel de fonction a lieu durant la pre-analyse, la fonction appellée est pré-analysée à son tour, etc.
+Une pre-analyse ressemble fortement à l'analyse concrète présentée plus tôt, à ceci près qu'aucune exécution symbolique n'est faite, aucune information n'est stockée
+tout au long du chemin. Une fois qu'un des trois critères est rencontrée, la pre-analyse se termine directement et son résultat est retourné.
+Si un appel de fonction a lieu durant la pre-analyse, la fonction appelée est pré-analysée à son tour, etc.
 \subparagraph{}
-Ces informations ne changent pas selon le contexte, par conséquent, ces resultats peuvent être stocké globalement et utilisé par tous les objets scanner
+Ces informations ne changent pas selon le contexte, par conséquent, ces résultats peuvent être stockés globalement et utilisés par tous les objets scanner
 durant leurs analyses. Néanmoins, pre-analyser toutes les fonctions au lancement de l'outil peut être très consommateur, et possiblement inutile. En conséquence,
-ce principe est soumis à ce qu'on appelle l'\textit{evaluation feignante} (\textit{lazy evaluation}). Une fonction n'est pré-analysée que lorsqu'elle est appellée pour la première fois.
-Une fois cette pre-analyse faite, le pilote, gouvernant tous les chemins, stocke le resultat, et le transmet au prochain chemin en cours d'analyse. Ce principe permet de garder une base
+ce principe est soumis à ce qu'on appelle l'\textit{évaluation feignante} (\textit{lazy evaluation}). Une fonction n'est pré-analysée que lorsqu'elle est appelée pour la première fois.
+Une fois cette pre-analyse faite, le pilote, gouvernant tous les chemins, stocke le résultat, et le transmet au prochain chemin en cours d'analyse. Ce principe permet de garder une base
 commune et légère au possible.
 
-\myparagraph{Traitement parralèle ou continu}
+\myparagraph{Traitement parallèle ou continu}
 Comme dit plusieurs fois auparavant, une analyse peut se diviser. Chacune de ses divisions crée un nouveau travail (job). Ces travaux sont stockés dans une file d'attente
-puis executés. Le problème reste à savoir si plusieurs analyses auront lieu en même temps ou non. Plus le nombre travaux se réalisant en parralèle est grand, plus l'empreinte en mémoire de l'outil
+puis exécutés. Le problème reste à savoir si plusieurs analyses auront lieu en même temps ou non. Plus le nombre travaux se réalisant en parallèle est grand, plus l'empreinte en mémoire de l'outil
 est grande. Plus ce nombre est petit, plus l'analyse globale est lente. Il s'agit donc d'un compromis entre les ressources disponibles et le temps alloué à l'analyse. Une option de l'outil permet
 de régler cela.
-\subparagraph{Le parralèlisme en Python}
-Dans la plupart des languages, la solution aurait été le multi-threading. Néanmoins, en Python, certains interpréteurs (dont le plus utilisé CPython) utilisent le Global Interpreter Lock (GIL).
-Ce verrou sur les ressources empéche l'execution en parallèle lorsqu'une même ressource est utilisée, même si l'utilisateur est conscient de l'environnement multi-threadé et a donc mis en place
-des mecanismes contre les problèmes de concurrence. Pour les programmes effectuant beaucoup d'entrée-sortie, cela n'est pas un problème. En revanche, pour les programmes utilisant majoritairement
-le processeur et les mêmes ressources, l'interet du multi-thread est moindre.
+\subparagraph{Le parallélisme en Python}
+Dans la plupart des langages, la solution aurait été le multi-threading. Néanmoins, en Python, certains interpréteurs (dont le plus utilisé CPython) utilisent le Global Interpreter Lock (GIL).
+Ce verrou sur les ressources empêche l'exécution en parallèle lorsqu'une même ressource est utilisée, même si l'utilisateur est conscient de l'environnement multi-threadé et a donc mis en place
+des mécanismes contre les problèmes de concurrence. Pour les programmes effectuant beaucoup d'entrée-sortie, cela n'est pas un problème. En revanche, pour les programmes utilisant majoritairement
+le processeur et les mêmes ressources, l'intérêt du multi-thread est moindre.
 \subparagraph{}
-Reste en conséquence le multi-processus. Là où plusieurs threads partagent la même mémoire virtuelle, différents processus ont chacun leur espace mémoire reservé. De plus,
+Reste en conséquence le multi-processus. Là où plusieurs threads partagent la même mémoire virtuelle, différents processus ont chacun leur espace mémoire réservé. De plus,
 afin de mieux gérer les travaux réalisé, l'outil fait appel à un bassin de processus en attente à qui l'on confie un travail à la fois. Ce bassin est initialisé au lancement,
-et par conséquent, tous les modules pythons sont initialisé séparement. C'est d'ailleurs pour cela que certains attributs font parti de l'objet copié dans le bassin au lieu d'être
+et par conséquent, tous les modules pythons sont initialisé séparément. C'est d'ailleurs pour cela que certains attributs font parti de l'objet copié dans le bassin au lieu d'être
 un attribut de module, comme pour le moteur de tainte. En effet un contexte n'est pas toujours assigné au même processus, et donc n'a plus le même état de l'attribut.
 Le schéma ci-dessous, tiré de Wikipedia, reprend le même concept mais avec des threads.
 \includegraphics[scale=0.5]{threadpool.png}\newline
+
+Le problème de plusieurs processus est qu'ils prennent plus de mémoire, ayant chacun leur espace mémoire là où celui-ci aurait pu être partagé. De plus. chacun des objets scanners doit être copié
+au sein du processus avant que le travail ne puisse être lancé. Après un certain temps de traitement, ces copies peuvent être extrêmement lentes.
+
 \myparagraph{Selection des symboles et utilisation}
-La suite de l'outil est composée : du scanner en lui même et d'un selectionneur de symboles.
-Le selectionneur prend en paramètre le chemin vers un fichier binaire, et propose à l'utilisateur de choisir, parmis les symboles accessibles au sein du programme,
+La suite de l'outil est composée : du scanner en lui même et d'un sélectionneur de symboles.
+Le sélectionneur prend en paramètre le chemin vers un fichier binaire, et propose à l'utilisateur de choisir, parmi les symboles accessibles au sein du programme,
 lesquels sont allocateurs et lesquels sont libérateurs. Il permet également de sauvegarder dans un fichier ces choix dans le même format que celui pris par le scanner.
 \textbf{TODO TODO INSERT IMAGE TODO TODO}
 \subparagraph{Le Scanner}
@@ -849,9 +852,20 @@ Malgré un travail qui n'est pas fini parfaitement, les fonctionnalités actuell
 Même si la prise en main de Miasm a été laborieuse, du fait du manque de documentation et de certains non-sens selon moi, et qu'Angr semble finalement beaucoup plus approprié, il n'y a pas
 d'astuces peu conventionnelle. C'est à dire que l'ensemble des corrections sont propres et ne se basent pas sur des modifications internes importante.
 \subparagraph{}
-L'analyse en sécurité demande une connaissance approfondie du language utilisé, et malgré de bonnes bases, certains comportement de Python (GIL, \_\_slots\_\_) ont demandé du temps de comprehension
-et ont été parfois un obstacle au bon developpement de l'outil.
+L'analyse en sécurité demande une connaissance approfondie du language utilisé, et malgré de bonnes bases, certains comportement de Python (GIL, \_\_slots\_\_) ont demandé du temps de compréhension
+et ont été parfois un obstacle au bon développement de l'outil. Le projet en lui même a requis des connaissances dans de divers domaines de l'informatique, comme par exemple la théorie des graphes.
+La recherche dans tous ces domaines a demandé également un certain temps.
+\subparagraph{}
+Même si l'outil n'est pas raisonnablement utilisable sur de gros projets, il peut l'être sur des binaires avec une taille plus réduite (lecteur de PDF simple, etc.).
 \subparagraph{}
 L'ensemble est assez documenté et commenté pour permettre une reprise du travail effectué  dans le futur. Une partie du développement a également été réservée pour prendre
-soin de découper le projet en fonction indépendante et modulable, d'éviter la surcharge et de faciliter la compréhension.
+soin de découper le projet en fonction indépendante et modulaire, d'éviter la surcharge et de faciliter la compréhension. Une poursuite du travail pourra notamment rendre l'outil fonctionnel sur des
+solutions à plus grande échelle.
+
+\myparagraph{Point de vue personnel et apprentissage}
+Ce stage m'a permis d'évoluer et de couvrir la sécurité technique sur son ensemble, et de manière assez approfondie. La première partie du stage, durant laquelle j'ai passé beaucoup de temps à
+regarder le fonctionnement en détail des systèmes d'exploitations Windows / Linux et leurs allocateurs mémoires a été très formatrice. Le sujet de stage en lui même m'a permis de me diversifier sur
+d'autres problématiques que la sécurité en elle-même, avec de la théorie des graphes, des problèmes d'optimisations mémoire, etc.
 \subparagraph{}
+L'équipe du pentest ou celle de la R\&D ont toujours été disponibles pour répondre à mes questions, et les différentes présentations organisées par les membres (NTFS, Python sur Windows, Wow64, etc.)
+permettent de monter en compétence sur d'autres domaines que le sujet de stage n'aborde pas ou peu.
