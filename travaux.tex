@@ -19,7 +19,11 @@ même si le comportement final reste souvent le même sur les différentes plate
 sur le contexte et le mécanisme d'exécution est souvent différent.\subparagraph{}
 
 \subparagraph{L'évolution des vulnérabilités de type use-after-free}
-\includegraphics[scale=0.5]{histogramme-uaf.png}\newline
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{histogramme-uaf.png}
+    \caption{Evolution des vulnérabilités de type use-after-free.}
+\end{figure}
 Beaucoup de problèmes de corruption mémoire sont directement dûs à la mauvaise utilisation
 du langage utilisé pour le développement. En effet, les langages de programmation tels que C
 ou C++ demandent une gestion de la mémoire manuelle (le C++ permet néanmoins une gestion plus ou moins automatisée
@@ -148,14 +152,14 @@ provenant de rapports fournis par des outils externes.
 Comme évoqué dans la section précédente de ce rapport, une analyse statique complète est souvent
 longue et très demandant en ressources. Les connaissances en début de stage sur le sujet étant limitées,
 une phase d'apprentissage étant indispensable (retirant donc du temps de développement), l'ambition du stage
-a donc été revue en conséquence.
-\subparagraph{}
+a donc été revue en conséquence.\newline
 Plusieurs objectifs étaient fixés concernant la globalité du projet:
 \begin{itemize}
         \item Une montée en compétence sur le sujet
         \item Un outil fonctionnel même si long à l'analyse
         \item Une base maintenable, documentée et reprenable dans des travaux futurs
 \end{itemize}
+\subparagraph{}
 
 Il était attendu qu'à la fin du stage, ces points la soient acquis. Le côte "fonctionnel"
 de l'outil était cependant laissé volontairement vague. Les fonctionnalités mises en place
@@ -202,9 +206,11 @@ données et garde généralement la même taille pour le temps de d'exécution, 
 dynamique et peuvent s'élargir ou rétrécir. Même s'il est possible d'augmenter la taille de la pile de manière dynamique (grâce
 à la fonction \textbf{alloca()} sur des systèmes UNIX par exemple), son utilisation n'est pas encouragée pour stocker des données
 dynamiques. Le tas, quant à lui, est un espace mémoire spécialement réservé pour cet emploi.
-\begin{center}
-\includegraphics[scale=0.4]{memory-layout.png}\newline
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.4]{memory-layout.png}\newline
+    \caption{Agencement de la mémoire.}
+\end{figure}
 
 
 \myparagraph{Allocation et Libération: base des algorithmes}
@@ -225,9 +231,11 @@ en information.
 Pour plus de rapidité lors de l'allocation et la libération, des liens sont conservés entre les différents blocs libres (suivant et précédent). Ainsi lors d'une allocation,
 un parcours simple à partir du premier bloc libre permet de trouver un espace convenant à la demande. D'autres informations peuvent être stockées selon l'implémentation.
 Un des exemples le plus courant est le suivant\footnote{http://gee.cs.oswego.edu/dl/html/malloc.html}:
-\begin{center}
-\includegraphics[scale=0.5]{malloc.png}\newline
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{malloc.png}\newline
+    \caption{Implémentation basique de malloc.}
+\end{figure}
 
 On remarque l'optimisation de l'espace pour les blocs libres. Au lieu d'utiliser de l'espace dans le cas général, qui ne servirait pas dans le cas des blocs alloués,
 on préfère placer les pointeurs vers les autres blocs libres à l'intérieur de l'espace libre. Cela amènera d'ailleurs une discussion sur la granularité des allocations dans
@@ -374,7 +382,7 @@ Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ain
 
 \myparagraph{Angr}
 \begin{center}
-\includegraphics[scale=0.3]{angr.png}
+    \includegraphics[scale=0.3]{angr.png}
 \end{center}
 Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
 Il permet de charger un binaire et d'avoir une représentation binaire de ce binaire en utilisant sa propre représentation intermédiaire, \textbf{VEX}.
@@ -386,7 +394,7 @@ binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques
 
 \myparagraph{Miasm}
 \begin{center}
-\includegraphics[scale=0.3]{cea.png}
+    \includegraphics[scale=0.3]{cea.png}
 \end{center}
 Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
 Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
@@ -397,7 +405,7 @@ quasi-inexistante.
 
 \myparagraph{Capstone}
 \begin{center}
-\includegraphics[scale=0.3]{capstone.png}
+    \includegraphics[scale=0.3]{capstone.png}
 \end{center}
 Capstone\footnote{http://www.capstone-engine.org/} est la star montante du monde de la rétro-ingénierie. En plus d'une communauté gigantesque et d'une
 documentation bien construite, de nombreux projets se basent déjà sur son architecture. De plus, le projet est plutôt jeune, ce qui permets d'avoir des
@@ -441,13 +449,15 @@ plus finement.
 Le graphe d'instructions d'un programme est représenté sous la forme d'un graphe orienté dont les nœuds rassemblent une ou plusieurs
 instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graphe relient les instructions dans leur ordre d'exécution.
 Un nœud peut avoir un ou plusieurs nœuds entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
-\begin{center}
-\includegraphics[scale=0.3]{condition.png}\newline
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{condition.png}\newline
+    \caption{Exemple de graphe avec conditions.}
+\end{figure}
 \subparagraph{}
 Cette illustration est la représentation graphique d'un exemple de graphe qui sera parcouru durant l'analyse. Le graphe est parcouru \textbf{dans l'ordre},
 en partant d'un point d'entrée donné. Ce \textbf{point d'entrée} peut soit être \textbf{une adresse en hexadécimal} (0xABCDF) ou \textbf{un nom de fonction
-suivi possiblement d'un offset hexadécimal} (main\[+0x12\]). Cette entrée doit correspondre à un \textbf{label} présent sur un des nœuds du graphes.
+suivi possiblement d'un offset hexadécimal} (main[+0x12]). Cette entrée doit correspondre à un \textbf{label} présent sur un des nœuds du graphes.
 \subparagraph{}
 Durant la décompilation, Miasm découpe le programme en \textbf{\textit{basic blocks}}. Un \textit{basic blocks} est défini comme ceci :
 une suite d'instruction successives se terminant par un branchement ou un point de sortie. Cela permet de découper en fonction logique
@@ -480,9 +490,11 @@ En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
         En l'occurence, toutes les assignations de cet exemple sont des \textbf{ExprInt}. S'il s'agissait d'un branchement, l'expression assigné à \textbf{IRDst}
         aurait été de type \textbf{ExprCond}.
 \end{itemize}
-\begin{center}
-\includegraphics[scale=0.3]{ir.png}\newline
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{ir.png}\newline
+    \caption{Représentation intermédiaire d'un appel de fonction.}
+\end{figure}
 \subparagraph{}
 Chacune des instructions intermédiaires représente une ou plusieurs instructions du binaire ciblé. En effet, un langage intermédiaire
 pouvant se retrouver à travailler sur plusieurs architectures cibles, une instruction complexe sur une d'elle est retransformée en de multiples
@@ -669,9 +681,11 @@ Cependant, Miasm n'annote pas le graphe avec les informations présentes dans le
 en se basant sur ces données.
 
 \subparagraph{Appels de fonction et exécution symbolique}
-\begin{center}
-\includegraphics[scale=0.3]{ir.png}\newline
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{ir.png}\newline
+    \caption{Représentation intermédiaire d'un appel de fonction.}
+\end{figure}
 L'exécution symbolique est faite pour que l'abstraction se fasse automatiquement et que les valeurs soient constamment à jour sans travail nécessaire de la part de l'utilisateur. Avec les appels de
 fonctions (notamment externes), plusieurs problèmes se posent.
 \begin{itemize}
@@ -825,7 +839,11 @@ afin de mieux gérer les travaux réalisé, l'outil fait appel à un bassin de p
 et par conséquent, tous les modules pythons sont initialisé séparément. C'est d'ailleurs pour cela que certains attributs font parti de l'objet copié dans le bassin au lieu d'être
 un attribut de module, comme pour le moteur de tainte. En effet un contexte n'est pas toujours assigné au même processus, et donc n'a plus le même état de l'attribut.
 Le schéma ci-dessous, tiré de Wikipedia, reprend le même concept mais avec des threads.
-\includegraphics[scale=0.5]{threadpool.png}\newline
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{threadpool.png}\newline
+    \caption{Agencement d'un bassin de processus.}
+\end{figure}
 
 Le problème de plusieurs processus est qu'ils prennent plus de mémoire, ayant chacun leur espace mémoire là où celui-ci aurait pu être partagé. De plus. chacun des objets scanners doit être copié
 au sein du processus avant que le travail ne puisse être lancé. Après un certain temps de traitement, ces copies peuvent être extrêmement lentes.
@@ -834,11 +852,20 @@ au sein du processus avant que le travail ne puisse être lancé. Après un cert
 La suite de l'outil est composée : du scanner en lui même et d'un sélectionneur de symboles.
 Le sélectionneur prend en paramètre le chemin vers un fichier binaire, et propose à l'utilisateur de choisir, parmi les symboles accessibles au sein du programme,
 lesquels sont allocateurs et lesquels sont libérateurs. Il permet également de sauvegarder dans un fichier ces choix dans le même format que celui pris par le scanner.
-\textbf{TODO TODO INSERT IMAGE TODO TODO}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{symbol-chooser.png}\newline
+    \caption{symbol-chooser.py}
+\end{figure}
+
 \subparagraph{Le Scanner}
 Le fichier \textbf{parse.py} est le point d'entrée de l'outil. Il permet d'afficher le graphe relatif à un programme, de personnaliser les fonctions traquées, ainsi que de préciser
 le point d'entrée de l'analyse.
-\textbf{TODO TODO INSERT IMAGE TODO TODO}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{options-parse.png}\newline
+    \caption{Options de l'outil}
+\end{figure}
 Les journaux de déboguage sont affichés sur la sortie d'erreur du programme. Le résultat final est affiché quand à lui sous forme de rapport sur la sortie standard à la fin de l'execution.
 \textbf{TODO TODO INSERT IMAGE TODO TODO}
 \myparagraph{Acompplissement annexes}
