@@ -7,9 +7,8 @@
 Sogeti est une Entreprise de Service du Numérique (ESN), filiale appartenant
 à 100\% à Capgemini. Sogeti est initialement l'acronyme pour "Société pour la Gestion de
 l'Entreprise et le Traitement de l'Information". Fondée en 1967 à Grenoble par Serge Kampf, elle opère
-dans 15 pays avec 20 000 collaborateurs, dont environ 6200 en France.
-\paragraph{}
-\paragraph{}
+dans 15 pays avec 25 000 collaborateurs, dont environ 6200 en France. Les partenariats sont néggociés au niveau
+du groupe (RSA, IBM, CA Tech, Fortinet, etc..).
 
 \subparagraph{European Security Expertise Center}
 \begin{center}
@@ -22,9 +21,20 @@ C'est dans cette dernière équipe que le stage s'est déroulé.
 L'ESEC est directement placé sous le pôle sécurité de Capgemini, dirigé par Frank
 Greverie, secondé par Jean Marc Bianchini pour Sogeti.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{organigramme.png}
+    \caption{Organisation de la sécurité - Sogeti.}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{bl-esec-orga.png}
+    \caption{Organisation Buisiness Line Sécurité - ESEC.}
+\end{figure}
+
 \subparagraph{}
 Au niveau France, Sogeti et l'ESEC ont plusieurs concurrents, dont Solucom, Deloitte,
-et HSC. Le domaine de la sécurité informatique étant en explosion, de nombreuses ESN existante
+et HSC. Le domaine de la sécurité informatique étant en pleine expansion, de nombreuses ESN existante
 essayent de développer leurs équipes dans le domaine, afin de gagner des parts de marché
 sur des sujets de plus en plus demandeur en terme de force salariale.
 
@@ -32,11 +42,13 @@ sur des sujets de plus en plus demandeur en terme de force salariale.
 Depuis 2014, l'ESEC bénéficie de la certification PASSI (Prestataires d'Audit de la Sécurité
 des Systèmes d'Information) délivrée par l'ANSSI (Agence Nationale de la Sécurité des Systèmes
 d'Information). Plusieurs autres sociétés ont également cette certification (Bull, CGI, HSC, Solucom, etc.).
-Sogeti ESEC est également agrégée pour effectuer des évaluations CSPN.
+Sogeti ESEC est également accréditée pour effectuer des évaluations CSPN.
 
-\begin{center}
-\includegraphics[scale=0.5]{activities.jpg}
-\end{center}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{activities.jpg}
+    \caption{Activités de l'ESEC.}
+\end{figure}
 
 \section*{Le service: Test d'intrusion / Pentest}
 Le service dans lequel s'est effectué le stage est celui du test d'intrusion. Il est dirigé par Guillaume Meunier et est composé
@@ -50,18 +62,18 @@ sécurité sont traités dans cette équipe (audit de code, de configuration, te
 Le cursus de la majeure SRS au sein de l'EPITA a pour but d'apporter une base technique et fonctionnelle
 sur la sécurité. En corrélation avec le niveau général de la promotion, les points abordés peuvent être
 plus ou moins avancés. Le sujet de stage portait sur de l'analyse statique de programme binaire, sans rapports
-d'outils externes, pour la détection de vulnérabilité de type usage-après-libération (use-after-free).
+d'outils externes, pour la détection de vulnérabilité de type "usage-après-libération" (use-after-free).
 \subparagraph{}
 Les pré-requis sont donc:
 \begin{itemize}
 \item L'analyse statique instrumentalisée.
-\item La compréhension du fonctionnement des allocateurs de mémoires.
+\item La compréhension du fonctionnement des allocateurs de mémoire.
 \item Le principe de teinte de mémoire/registre pour l'analyse statique.
 \item Des notions en théorie des graphes.
-\item Des notions en rétro ingénierie.
+\item Des notions en rétro-ingénierie.
 \end{itemize}
 
-De ces points, la rétro ingénierie et la théorie des graphes sont suffisamment enseignés à l'EPITA,
+De ces points, la rétro-ingénierie et la théorie des graphes sont suffisamment enseignées à l'EPITA,
 durant l'année de spécialisation ou bien pendant la première année du cycle ingénieur.
 \subparagraph{}
 Concernant les autres points, l'analyse statique instrumentalisée, en comparaison avec ce qui a été
@@ -74,12 +86,12 @@ Le point majoritairement manquant concernant ce stage et la plus grosse lacune c
 la gestion de la mémoire par un système d'exploitation, des différents niveaux d'allocation mémoire, et de leur fonctionnement précis
 selon les cas (niveau noyau ou niveau utilisateur, différents appels, granularité, algorithme de défragmentation/optimisation, ...).
 \subparagraph{}
-Cette notion est vraiment très peu enseignée durant le cursus de l'EPITA, quelque soit la spécialisation, même si une partie du projet KSTOS
+Cette notion est vraiment très peu enseignée durant le cursus de l'EPITA, quelle que soit la spécialisation, même si une partie du projet KSTOS
 demandait (à un niveau relativement peu avancé) la compréhension de la relation mémoire physique / mémoire virtuelle.
 Les notions et l'étude des ABI (Interface Application-Binaire / Application Binary Interface) est elle aussi assez peu évoquée.
 \subparagraph{}
 
-Néanmoins, le premier mois de stage a été dédié aux points défaillants et le reste du stage a pu se dérouler avec assez de connaissance
+Néanmoins, le premier mois de stage a été dédié à combler ces lacunes et le reste du stage a pu se dérouler avec assez de connaissance
 pour être confortable dans ces domaines la.
 
 \subparagraph{}

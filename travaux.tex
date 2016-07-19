@@ -36,7 +36,9 @@ Ce n'est cependant pas toujours le cas et les allocateurs de mémoires / ramasse
 
 \subparagraph{Exemple}
 Un exemple très simple et souvent rencontré dans la littérature est le suivant:
-\begin {lstlisting}[frame=single]
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 int main(void)
 {
     int *a = malloc(sizeof(int));
@@ -49,7 +51,9 @@ int main(void)
     *a = 10;
     printf("\%d", *b); // affiche 10
 }
-\end{lstlisting}
+    \end{lstlisting}
+    \caption{Exemple de use-after-free.}
+\end{figure}
 \subparagraph{}
 Sur une distribution Linux classique comme Ubuntu, quelque soit la taille de mots
 de l'architecture (32 ou 64 bits), les adresses a et b sont exactement les mêmes.
@@ -298,8 +302,8 @@ résidant sur la pile du programme ne pointe à l'intérieur de la zone mémoire
 Le sujet de stage porte toutefois sur une vulnérabilité en elle-même, et ne prends pas en compte le fait que celle-ci soit exploitable selon
 le système d'exploitation, l'allocateur, etc.
 
-\section{Moteur d'execution concolique}
-\myparagraph{Pourquoi de l'execution symbolique ?}
+\section{Moteur d'exécution concolique}
+\myparagraph{Pourquoi de l'exécution symbolique ?}
 Un des défauts de l'analyse statique est l'absence de valeurs concrètes facilitant l'analyse. Même si c'est également
 le but majeur de ce type d'analyse (la possibilité d'explorer tous les chemins), il est toujours agréable de conserver une valeur
 associée à un identifiant ou à une zone mémoire, que ce soit sur la pile, sur le tas, ou dans d'autres segments. On peut ainsi se baser
@@ -324,7 +328,9 @@ par défaut ou bien à un symbole non utilisé ailleurs.
 
 \myparagraph{Concolique: un mélange de concret et de symbolique}
 Parfois, lors de l'analyse d'un programme, lorsqu'un chemin est pris par exemple, une seule valeur est possible pour tel ou tel identifiant/registre/espace mémoire.
-\begin {lstlisting}[frame=single]
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 int main(void)
 {
     int a = f();
@@ -333,14 +339,16 @@ int main(void)
     else
         h();
 }
-\end{lstlisting}
+    \end{lstlisting}
+    \caption{Branchement restrictif à une seule valeur.}
+\end{figure}
 Dans l'exemple ci-dessus, deux chemins sont possibles: l'un menant à un appel à \textbf{g()}, l'autre à \textbf{h()}.
 L'analyse peut alors se séparer en deux chemins. Néanmoins, pour le chemin menant à \textbf{g()}, la valeur de l'identifiant \textbf{a}
 n'a qu'une seule possibilité, la valeur 0. Certains solveurs de contraintes, dont nous parlerons dans la prochaine section, permettent d'arriver
 à des conclusions comme celle ci en gardant toutes les contraintes valables pour un chemin.
 \subparagraph{}
 Dans des cas comme celui-ci, la valeur est directement injectée dans le moteur d'exécution symbolique. Ce mélange de valeur concrète et symbolique est
-appelé \textbf{execution concolique}. Cela permet de réduire le temps de calcul des assertions (la valeur correspondante étant déjà prise en compte) et de
+appelé \textbf{exécution concolique}. Cela permet de réduire le temps de calcul des assertions (la valeur correspondante étant déjà prise en compte) et de
 réduire en mémoire la taille des expressions symboliques.
 
 
@@ -368,7 +376,7 @@ un pré-traitement sur l'entrée était nécessaire. En effet, la solution final
 d'entrée. Il n'était pas concevable d'effectuer le traitement sur du binaire, ou d'effectuer une analyse différentes selon le format
 et l'architecture visés par le binaire (les instructions étant différentes).
 \subparagraph{}
-Un moteur d'execution symbolique est également de mise. Il représente à lui seul une grosse partie de l'analyse statique permettant de
+Un moteur d'exécution symbolique est également de mise. Il représente à lui seul une grosse partie de l'analyse statique permettant de
 garder en mémoire les valeurs des identifiants par rapport à leur valeur d'origine. Un solveur SMT permet également de réduire le nombre
 de chemins possibles et réduit souvent drastiquement le problème d'explosion de chemins.
 \subparagraph{}
@@ -386,7 +394,7 @@ Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ain
 \end{center}
 Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
 Il permet de charger un binaire et d'avoir une représentation binaire de ce binaire en utilisant sa propre représentation intermédiaire, \textbf{VEX}.
-Il dispose également d'un moteur d'execution symbolique et est très complet dans ses fonctionnalités, permettant de récupérer pleins d'information via
+Il dispose également d'un moteur d'exécution symbolique et est très complet dans ses fonctionnalités, permettant de récupérer pleins d'information via
 une API plutôt complète. La résolution des contraintes est réalisée grâce à un module interne nommé \textbf{Claripy}
 \subparagraph{}
 En terme de maturité, le projet a vite atteint une autre dimension, et ses utilisateurs sont de plus en plus nombreux. Il supporte plusieurs formats
@@ -397,7 +405,7 @@ binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques
     \includegraphics[scale=0.3]{cea.png}
 \end{center}
 Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
-Il dispose de toutes les fonctionnalités nécessaires (moteurs d'execution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
+Il dispose de toutes les fonctionnalités nécessaires (moteurs d'exécution, etc.). Il supporte également les architectures courantes. Le solveur de contraintes est
 cependant externe, l'outil traduisant juste la représentation intermédiaire vers un langage compréhensible par le très connu Z3 de Microsoft.
 \subparagraph{}
 Un des désavantage de Miasm est ses fortes dépendances envers un nombre élevé de bibliothèques externes, sur des versions parfois obsolètes. La documentation est également
@@ -486,7 +494,7 @@ En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
 \begin{itemize}
     \item Pour le \textit{basic block} \textbf{main+0x23}, la première instruction (\textbf{ExprMem}) assigne à l'emplacement désigné par \textbf{l'adresse}
         présente dans \textbf{ESP} la valeur \textbf{0x4}.
-    \item Les blocs se finissent tous par une assignation de l'identifiant \textbf{IRDst}, indiquant le prochain basic blocs dans l'execution.
+    \item Les blocs se finissent tous par une assignation de l'identifiant \textbf{IRDst}, indiquant le prochain basic blocs dans l'exécution.
         En l'occurence, toutes les assignations de cet exemple sont des \textbf{ExprInt}. S'il s'agissait d'un branchement, l'expression assigné à \textbf{IRDst}
         aurait été de type \textbf{ExprCond}.
 \end{itemize}
@@ -532,7 +540,10 @@ un UAF est détecté.
 
 \myparagraph{Algorithme basique}
 L'exemple de pseudo-code ci dessous illustre l'algorithme utilisé pour la base de l'analyse.
-\begin {lstlisting}[frame=single]
+\newpage
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 allocation_id = 0
 head_node = flowgraph.get_node(start)
 
@@ -562,7 +573,9 @@ for statement in ir_block:
                 free_set.add(tracking_set[arguments])
 
 go_to_next_basic_block()
-\end{lstlisting}
+    \end{lstlisting}
+    \caption{Squelette d'analyse Use-After-Free.}
+\end{figure}
 
 L'algorithme utilise deux structures de données très importantes :
 
@@ -598,6 +611,7 @@ donc pas d'explication détaillée de son fonctionnement dans ce rapport. Néanm
 Le but de tout projet à long terme est d'être maintenable par des nouveaux arrivants, et de pouvoir s'améliorer
 sans difficultés. Cela passe par la documentation, mais également par une architecture et une conception réfléchie à l'avance
 et si possible modulaire.
+\newpage
 \subparagraph{Architecture}
 Le projet est divisé en trois parties:
 \begin{enumerate}
@@ -612,7 +626,9 @@ En effet, si une optimisation prend le pas sur d'autres, on restreint les possib
 \subparagraph{}
 Le parcours de graphe est en réalité un squelette, avec plusieurs endroits dans lesquels il est possible de faire des traitements ou optimisations. L'algorithme de base
 épuré pour ne laisser que le parcours de graphe ressemble à ceci:
-\begin {lstlisting}[frame=single]
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 allocation_id = 0
 head_node = flowgraph.get_node(start)
 
@@ -629,8 +645,10 @@ for statement in ir_block:
         # Do something Z
 
 go_to_next_basic_block()
-\end{lstlisting}
-
+    \end{lstlisting}
+    \caption{Squelette de parcours de graphe.}
+\end{figure}
+\newpage
 \subparagraph{Modules python}
 Le projet est découpé en plusieurs modules python:
 \begin{itemize}
@@ -667,7 +685,7 @@ intégrante de l'objet pour garder leur état. Ceci pose un problème d'espace m
 la technique de parallèlisme utilisé et le fonctionnement interne de Python. C'est par exemple le cas de \textbf{register\_var\_counter} qui devrait faire partie du moteur de tainte.
 
 \myparagraph{Modification du comportement par défaut de Miasm}
-Le désassemblage et l'execution symbolique de Miasm fonctionne de manière plus ou moins satisfaisante dans la plupart des cas. Néanmoins,
+Le désassemblage et l'exécution symbolique de Miasm fonctionne de manière plus ou moins satisfaisante dans la plupart des cas. Néanmoins,
 certains comportements ne convenaient pas à l'analyse présentée dans ce rapport. Deux sont à noter: les appels de fonctions lors de l'exécution symbolique ainsi que
 la récupération des symboles.
 \subparagraph{Récupération des symboles}
@@ -713,7 +731,9 @@ Pour palier à ce problème, tout en gardant une analyse correcte, il faut trouv
 \subparagraph{}
 L'algorithme suivant essayer de déterminer un \textit{point fixe} dans l'analyse. C'est à dire que ré appliquer l'analyse avec le contexte courant sur cette branche serait
 égal à ce qui a déjà été fait.
-\begin {lstlisting}[frame=single]
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 # Si le bloc a deja et visite
 if start in scanner.marked:
     if scanner.marked[start] > LIMIT_VISIT_NODE:
@@ -734,7 +754,9 @@ if start in scanner.marked:
 if next not in scanner.useless_branches[start]
         and not in_infinite_loop(start):
     go_to_next_basic_block()
-\end{lstlisting}
+    \end{lstlisting}
+    \caption{Optimisation de boucles.}
+\end{figure}
 Sans ces heuristiques là, l'analyse est quasi certaine de boucler indéfiniment. La comparaison du contexte dans le pseudo-code est également simplifiée pour des soucis de lisibilité.
 Imaginons que l'analyse passe dans une boucle où un objet est alloué, utilisé, puis supprimé (un envoie de message sur le réseau par exemple). Les deux contextes
 ne seront pas strictement égaux. C'est à dire que les identifiants d'allocation contenus dans les mêmes zones mémoire seront décalés.
@@ -755,17 +777,18 @@ ou deux instructions machine).
 Lorsqu'une fonction est appelée, le scanner lance l'analyse avec le contexte courant sur le premier nœud de cette fonction. Comme une analyse classique, celle de la fonction peut se diviser
 en plusieurs lorsqu'un branchement est rencontré. On se retrouve donc possiblement avec plusieurs chemins retournant de cette fonction. Afin de différencier chacun de ces chemins (et donc contexte),
 un appel à une fonction accumule les retours de l'analyse. Une fois tous les retours obtenus, tous les contextes retournant sont lancé sur le nœud suivant.
-\subparagraph{}
-\begin {lstlisting}[frame=single]
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
 void g(int *a)
 {
     // g1
     if (*a == 3)
-        // g2
-        *a = 4;
+    // g2
+    *a = 4;
     else
-        // g3
-        *a = 3;
+    // g3
+    *a = 3;
 }
 
 void f(void)
@@ -774,13 +797,15 @@ void f(void)
     int a = rand();
     g(&a);
     if (a == 3)
-        // f2
-        puts("a == 3");
+    // f2
+    puts("a == 3");
     else
-        // f3
-        puts("a != 3");
+    // f3
+    puts("a != 3");
 }
-\end{lstlisting}
+    \end{lstlisting}
+    \caption{Exemple d'explosions de chemin.}
+\end{figure}
 Dans l'exemple suivant:
 \begin{enumerate}
     \item le chemin f1-() appele g()
@@ -866,7 +891,7 @@ le point d'entrée de l'analyse.
     \includegraphics[scale=0.3]{options-parse.png}\newline
     \caption{Options de l'outil}
 \end{figure}
-Les journaux de déboguage sont affichés sur la sortie d'erreur du programme. Le résultat final est affiché quand à lui sous forme de rapport sur la sortie standard à la fin de l'execution.
+Les journaux de déboguage sont affichés sur la sortie d'erreur du programme. Le résultat final est affiché quand à lui sous forme de rapport sur la sortie standard à la fin de l'exécution.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.3]{results.png}\newline
