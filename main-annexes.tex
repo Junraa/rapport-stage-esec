@@ -1,0 +1,93 @@
+\documentclass[a4paper, 12pt]{report}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[french]{babel}
+\usepackage{listings}
+\usepackage{titlesec}
+
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\newline\\}
+
+\titleformat{\subparagraph}
+    {\normalfont\normalsize\bfseries}{\thesubparagraph}{1em}{}
+\titlespacing*{\subparagraph}{\parindent}{3.25ex plus 1ex minus .2ex}{.75ex plus .1ex}
+
+\title{Rapport de Stage}
+\author{Pierre De Abreu}
+\date{08 Février 2016 - 08 Aout 2016}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+ 
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Sogeti, ESEC}
+\lhead{EPITA / SRS 2016}
+\rfoot{\includegraphics[width=1cm, height=1cm]{esec-footer.png}}
+\lfoot{\includegraphics[width=2cm]{epita.png}}
+\lfoot{\includegraphics[width=2cm]{srs.png}}
+\cfoot{\thepage}
+ 
+\begin{document} 
+\lstset{language=python}
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page. The '~' is needed because \\
+% only works if a paragraph has started.
+\includegraphics[width=0.3\textwidth]{epita.png}~\\[1cm]
+
+\textsc{\LARGE EPITA}\\[1.5cm]
+
+\textsc{\Large Stage de fin d'étude - Annexes}\\[0.5cm]
+\textsc{\Large 08/02/2016 - 08/08/2016}
+
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries Sogeti, ESEC \\[0.4cm] }
+
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Auteur:}\\
+Pierre \textsc{De Abreu}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Maitre de stage:} \\
+Adrien \textsc{Fay}
+\end{flushright}
+\end{minipage}
+
+\includegraphics[width=0.3\textwidth]{esec.png}~\\[1cm]
+
+\vfill
+
+% Bottom of the page
+{\large Recherche de vulnérabilité (Use-After-Free)\paragraph{}}
+{\large 21 Juillet 2016}
+
+\end{center}
+\end{titlepage}
+
+\begin{large}
+\thispagestyle{empty}
+\tableofcontents
+\end{large}
+\setcounter{page}{0}
+
+\part{Documentation sur les logiciels}
+\include{annexes-materiel}
+\part{Résultats bruts}
+\include{annexes-resultats}
+
+\begin{large}
+\thispagestyle{empty}
+\listoffigures
+.
+\end{large}
+
+\end{document}

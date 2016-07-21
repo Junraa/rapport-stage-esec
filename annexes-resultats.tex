@@ -80,9 +80,24 @@ g_free@extern
 evince sous Linux (Ubuntu 14.10).
 \end{figure}
 
+\section{Convention d'appel}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{main.png}
+    \caption{Appel d'une fonction sur SystemV 64 bits.}
+    Les registres suffisent aux arguments.
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{main32.png}
+    \caption{Appel d'une fonction sur SystemV 32 bits.}
+    Les arguments sont passé sur la pile. La différence avec les autres placements
+sur la pile est l'offset positif.
+\end{figure}
+
 %\begin{figure}[h]
 %    \centering
 %    \includegraphics[scale=0.001]{tracking-set.png}
 %    \caption{Graphe d'un petit projet de première année du cyle ingénieur.}
 %\end{figure}
-
