@@ -15,4 +15,4 @@ annexes.pdf: $(SRC_ANNEXES)
 	pdflatex -synctex=1 -halt-on-error -interaction=nonstopmode $<
 
 clean:
-	${RM} *.aux *.pdf *.log *.dvi
+	${RM} *.aux *.pdf *.log *.dvi *.lof *.lot

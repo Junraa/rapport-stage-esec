@@ -21,7 +21,7 @@ en l'utilisation d'une zone mémoire après que celle ci ai été libérée.
 \subparagraph{L'évolution des vulnérabilités de type use-after-free}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{histogramme-uaf.png}
+    \includegraphics[scale=0.5]{images/histogramme-uaf.png}
     \caption{Evolution des vulnérabilités de type use-after-free.}
 \end{figure}
 Beaucoup de problèmes de corruption mémoire sont directement dûs à la mauvaise utilisation
@@ -211,7 +211,7 @@ dynamique et peuvent s'élargir ou rétrécir. Même s'il est possible d'augment
 dynamiques. Le tas, quant à lui, est un espace mémoire spécialement réservé pour cet emploi.
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.4]{memory-layout.png}\newline
+    \includegraphics[scale=0.4]{images/memory-layout.png}\newline
     \caption{Agencement de la mémoire.}
 \end{figure}
 
@@ -233,7 +233,7 @@ en information.
 \subparagraph{}
 \begin{figure}
     \centering
-    \includegraphics[scale=0.5]{malloc.png}\newline
+    \includegraphics[scale=0.5]{images/malloc.png}\newline
     \caption{Implémentation basique de malloc.}
     \label{fig:malloc}
 \end{figure}
@@ -391,7 +391,7 @@ Les outils consultés feront chacun l'objet d'un chapitre, et le choix final ain
 \myparagraph{Angr}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{angr.png}
+    \includegraphics[scale=0.3]{images/angr.png}
     \caption{Logo d'Anr.}
 \end{figure}
 Angr\footnote{https://github.com/angr/pyvex} est un projet d'analyse binaire créé par le laboratoire de sécurité informatique de l'UC Santa Barbara (USA).
@@ -405,7 +405,7 @@ binaire (PE, ELF, IdaBin, ...) ainsi que la plupart des architectures classiques
 \myparagraph{Miasm}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{cea.png}
+    \includegraphics[scale=0.3]{images/cea.png}
     \caption{Logo du CEA.}
 \end{figure}
 Miasm\footnote{https://github.com/cea-sec/miasm} est un projet développé principalement par des membres de l'équipe IT Security du Comité à l'Energie Atomique (CEA).
@@ -418,7 +418,7 @@ quasi-inexistante.
 \myparagraph{Capstone}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{capstone.png}
+    \includegraphics[scale=0.3]{images/capstone.png}
     \caption{Logo du Capstone.}
 \end{figure}
 \begin{center}
@@ -467,7 +467,7 @@ instructions (intermédiaires ou liées à l'architecture). Les arcs de ce graph
 Un nœud peut avoir un ou plusieurs arcs entrants, ainsi que un ou deux arcs sortants (dans le cas d'une condition par exemple).
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{condition.png}\newline
+    \includegraphics[scale=0.3]{images/condition.png}\newline
     \caption{Exemple de graphe avec conditions.}
     \label{fig:graph-cond}
 \end{figure}
@@ -509,7 +509,7 @@ En prenant en exemple le graphe suivant, un début de lecture serait le suivant:
 \end{itemize}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{ir.png}\newline
+    \includegraphics[scale=0.3]{images/ir.png}\newline
     \caption{Représentation intermédiaire d'un appel de fonction.}
 \end{figure}
 \subparagraph{}
@@ -713,7 +713,7 @@ en se basant sur ces données.
 \subparagraph{Appels de fonction et exécution symbolique}
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{ir.png}\newline
+    \includegraphics[scale=0.3]{images/ir.png}\newline
     \caption{Représentation intermédiaire d'un appel de fonction.}
 \end{figure}
 L'exécution symbolique est faite pour que l'abstraction se fasse automatiquement et que les valeurs soient constamment à jour sans travail nécessaire de la part de l'utilisateur. Avec les appels de
@@ -884,7 +884,7 @@ un attribut de module, comme pour le moteur de teinte. En effet un contexte n'es
 Le schéma ci-dessous, tiré de Wikipedia, reprend le même concept mais avec des threads.
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{threadpool.png}\newline
+    \includegraphics[scale=0.5]{images/threadpool.png}\newline
     \caption{Agencement d'un bassin de processus.}
 \end{figure}
 
@@ -897,7 +897,7 @@ Le sélectionneur prend en paramètre le chemin vers un fichier binaire, et prop
 lesquels sont allocateurs et lesquels sont libérateurs. Il permet également de sauvegarder dans un fichier ces choix dans le même format que celui pris par le scanner.
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{symbol-chooser.png}\newline
+    \includegraphics[scale=0.3]{images/symbol-chooser.png}\newline
     \caption{symbol-chooser.py}
 \end{figure}
 
@@ -906,13 +906,13 @@ Le fichier \textbf{parse.py} est le point d'entrée de l'outil. Il permet d'affi
 le point d'entrée de l'analyse.
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.7]{options-parse.png}\newline
+    \includegraphics[scale=0.7]{images/options-parse.png}\newline
     \caption{Options de l'outil}
 \end{figure}
 Les journaux de déboguage sont affichés sur la sortie d'erreur du programme. Le résultat final est affiché quand à lui sous forme de rapport sur la sortie standard à la fin de l'exécution.
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.6]{results.png}\newline
+    \includegraphics[scale=0.6]{images/results.png}\newline
     \caption{Exemple de résultat.}
 \end{figure}
 \myparagraph{Accomplissement annexes}
