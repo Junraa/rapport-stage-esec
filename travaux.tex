@@ -366,6 +366,12 @@ de sens d'un point de vue relationnel.
 Pour un chemin dont les contraintes sont satisfaisables selon le solveur SMT, ce même solveur peut fournir un modèle. Ce dernier représente l'ensemble des valeurs possibles
 pour les variables rentrant en jeu dans les contraintes. Lorsque plusieurs valeurs sont possibles, on peut au choix et selon le but de l'analyse, sauvegarder les contraintes
 en espérant de futures conditions plus restrictives, ou assigner un des ensembles de valeurs à nos identifiants symboliques.
+\subparagraph{}
+Dans l'exemple \ref{fig:condition}, les contraintes du solveur serait (en utilisant la représentation intermédiaire de Miasm):
+\begin{itemize}
+    \item ExprId('a') == 0 lors de l'appel à g. Le seul modèle possible est [ a == 0].
+    \item ExprId('a') != 0 lors de l'appel à h. Un des modèle possible est [ a == 1 ].
+\end{itemize}
 
 
 
@@ -414,7 +420,7 @@ cependant externe, l'outil traduisant juste la représentation intermédiaire ve
 \subparagraph{}
 Un des inconvénients de Miasm est ses fortes dépendances envers un nombre élevé de bibliothèques externes, sur des versions parfois obsolètes. La documentation est également
 quasi-inexistante.
-
+\newpage
 \myparagraph{Capstone}
 \begin{figure}[h]
     \centering
