@@ -5,6 +5,34 @@
     \caption{Représentation de l'attribut tracking\_set (affichage de debug).}
     Chaque emplacement est associé à un identifiant d'allocation.
 \end{figure}
+\begin{figure}[h]
+    \includegraphics[height=8cm]{images/output-samples.png}
+    \caption{Sortie complète d'un test.}
+    Chaque résultat positif est décomposé comme suit:
+    \begin{itemize}
+        \item (by XXXX) donne le PID du processus ayant découvert la vunérabilité.
+        \item Le registre ou emplacement mémoire lu coupable.
+        \item Le noeud du graphe sur lequel le résultat a lieu.
+        \item L'indicateur d'allocation de la zone mémoire utilisée.
+    \end{itemize}
+    A la fin du programme, chaque chemin positif est donné en sortie.
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin {lstlisting}[frame=single]
+allocation:
+g_malloc0@extern
+g_malloc0_n@extern
+g_malloc@extern
+g_malloc_n@extern
+free:
+g_free@extern
+    \end{lstlisting}
+    \caption{Fonction traquées pour le logiciel evince. }
+    Fichier de configuration contenant les fonctions traquées pour le logiciel
+evince sous Linux (Ubuntu 14.10).
+\end{figure}
 
 \chapter{Graphes}
 
@@ -63,21 +91,6 @@ int main(void)
     \centering
     \includegraphics[scale=0.125]{images/simple-graph.png}
     \caption{Graphe associé au programme 1}
-\end{figure}
-\begin{figure}[h]
-    \centering
-    \begin {lstlisting}[frame=single]
-allocation:
-g_malloc0@extern
-g_malloc0_n@extern
-g_malloc@extern
-g_malloc_n@extern
-free:
-g_free@extern
-    \end{lstlisting}
-    \caption{Fonction traquées pour le logiciel evince. }
-    Fichier de configuration contenant les fonctions traquées pour le logiciel
-evince sous Linux (Ubuntu 14.10).
 \end{figure}
 
 \chapter{Convention d'appel}

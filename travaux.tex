@@ -878,7 +878,7 @@ puis exécutés. Le problème reste à savoir si plusieurs analyses auront lieu 
 est grande. Plus ce nombre est petit, plus l'analyse globale est lente. Il s'agit donc d'un compromis entre les ressources disponibles et le temps alloué à l'analyse. Une option de l'outil permet
 de régler cela.
 \subparagraph{Le parallélisme en Python}
-Dans la plupart des langages, la solution aurait été le multi-threading. Néanmoins, en Python, certains interpréteurs (dont le plus utilisé CPython) utilisent le Global Interpreter Lock (GIL).
+Dans la plupart des langages, la solution aurait été le multi-threading. Néanmoins, en Python, certains interpréteurs (dont le plus utilisé CPython) utilisent le Global Interpreter Lock\footnote{http://www.dabeaz.com/python/UnderstandingGIL.pdf} (GIL).
 Ce verrou sur les ressources empêche l'exécution en parallèle lorsqu'une même ressource est utilisée, même si l'utilisateur est conscient de l'environnement multi-threadé et a donc mis en place
 des mécanismes contre les problèmes de concurrence. Pour les programmes effectuant beaucoup d'entrée-sortie, cela n'est pas un problème. En revanche, pour les programmes utilisant majoritairement
 le processeur et les mêmes ressources, l'intérêt du multi-thread est moindre.
